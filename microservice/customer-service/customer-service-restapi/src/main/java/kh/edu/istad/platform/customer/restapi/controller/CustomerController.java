@@ -40,23 +40,23 @@ public class CustomerController {
         return customerWebMapper.toResponse(result);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{customerId}")
     public CustomerUpdateResponse updateCustomer(
-            @PathVariable UUID id,
+            @PathVariable("customerId") UUID customerId,
             @RequestBody CustomerUpdateRequest customerUpdateRequest
     ){
         UpdateCustomerResult result = updateCustomerUseCase.execute(
-                customerWebMapper.toUpdateCommand(id, customerUpdateRequest)
+                customerWebMapper.toUpdateCommand(customerId, customerUpdateRequest)
         );
         return customerWebMapper.toUpdateResponse(result);
     }
 
-    @PutMapping("/{id}/deactivate")
+    @PatchMapping("/{customerId}/deactivate")
     public CustomerDeactivateResponse deactivateCustomer(
-            @PathVariable UUID id
+            @PathVariable("customerId") UUID customerId
     ){
         DeactivateCustomerResult result = deactivateCustomerUseCase.execute(
-                new DeactivateCustomerCommand(id)
+                new DeactivateCustomerCommand(customerId)
         );
         return customerWebMapper.toDeactivateResponse(result);
     }
