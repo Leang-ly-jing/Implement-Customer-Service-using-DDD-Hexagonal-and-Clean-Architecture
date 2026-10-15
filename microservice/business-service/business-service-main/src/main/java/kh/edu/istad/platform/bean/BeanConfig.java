@@ -1,4 +1,4 @@
-package kh.edu.istad.platform.business.bean;
+package kh.edu.istad.platform.bean;
 
 import kh.edu.istad.platform.domain.service.BusinessDomainService;
 import kh.edu.istad.platform.domain.service.BusinessDomainServiceImpl;

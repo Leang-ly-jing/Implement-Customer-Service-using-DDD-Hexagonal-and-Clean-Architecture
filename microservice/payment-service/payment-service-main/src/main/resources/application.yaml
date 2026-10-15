@@ -1,0 +1,15 @@
+server:
+  port: 9393
+
+spring:
+  application:
+    name: payment-service
+  mongodb:
+    uri: mongodb://mongod:mongod@localhost:2026/payment_db?authSource=admin&uuidRepresentation=standard
+  data:
+    mongodb:
+      auto-index-creation: true
+      uuid-representation: standard
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true

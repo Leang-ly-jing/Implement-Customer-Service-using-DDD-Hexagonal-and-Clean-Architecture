@@ -22,7 +22,7 @@ public class CreateOrderMapper {
         return Business.Builder.builder()
                 .businessId(new BusinessId(command.businessId()))
                 .products(command.items().stream()
-                        .map(item -> new Product(new ProductId(item.productId())))
+                        .map(item -> new Product(new ProductId(item.productId()), "", new Money(item.price())))
                         .toList())
                 .build();
     }
@@ -56,7 +56,7 @@ public class CreateOrderMapper {
 
     private List<OrderItem> toOrderItems(List<OrderItemCommand> itemCommands) {
         return itemCommands.stream().map(item -> OrderItem.Builder.builder()
-                .product(new Product(new ProductId(item.productId())))
+                .product(new Product(new ProductId(item.productId()), "", new Money(item.price())))
                 .price(new Money(item.price()))
                 .quantity(item.quantity())
                 .subTotal(new Money(item.subTotal()))

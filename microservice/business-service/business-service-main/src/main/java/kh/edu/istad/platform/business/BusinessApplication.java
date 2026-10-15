@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "kh.edu.istad.platform")
 @EnableReactiveMongoRepositories(basePackages = "kh.edu.istad.platform.persistence.repository")
 public class BusinessApplication {
 
