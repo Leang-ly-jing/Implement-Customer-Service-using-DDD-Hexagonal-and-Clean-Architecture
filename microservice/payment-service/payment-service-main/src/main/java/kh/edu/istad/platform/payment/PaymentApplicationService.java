@@ -6,9 +6,9 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 
 @SpringBootApplication(scanBasePackages = "kh.edu.istad.platform")
 @EnableReactiveMongoRepositories(basePackages = "kh.edu.istad.platform")
-public class PaymentApplication {
+public class PaymentApplicationService {
 
     static void main(String[] args) {
-        SpringApplication.run(PaymentApplication.class, args);
+        SpringApplication.run(PaymentApplicationService.class, args);
     }
 }

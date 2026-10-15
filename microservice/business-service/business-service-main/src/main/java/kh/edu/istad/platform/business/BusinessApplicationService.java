@@ -6,9 +6,9 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 
 @SpringBootApplication(scanBasePackages = "kh.edu.istad.platform")
 @EnableReactiveMongoRepositories(basePackages = "kh.edu.istad.platform.persistence.repository")
-public class BusinessApplication {
+public class BusinessApplicationService {
 
     static void main(String[] args) {
-        SpringApplication.run(BusinessApplication.class, args);
+        SpringApplication.run(BusinessApplicationService.class, args);
     }
 }
