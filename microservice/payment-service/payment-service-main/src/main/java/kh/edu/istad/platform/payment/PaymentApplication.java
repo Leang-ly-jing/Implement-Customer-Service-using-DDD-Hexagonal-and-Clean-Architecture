@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
 @SpringBootApplication(scanBasePackages = "kh.edu.istad.platform")
-@EnableReactiveMongoRepositories(basePackages = "kh.edu.istad.platform.persistence.repository")
+@EnableReactiveMongoRepositories(basePackages = "kh.edu.istad.platform")
 public class PaymentApplication {
 
     static void main(String[] args) {
