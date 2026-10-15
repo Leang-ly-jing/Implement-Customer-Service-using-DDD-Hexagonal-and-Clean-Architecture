@@ -1,0 +1,11 @@
+plugins {
+    id 'springboot-common-conventions'
+}
+
+dependencies {
+    implementation 'kh.edu.istad:payment-core-domain'
+    implementation 'kh.edu.istad:payment-application-service'
+    implementation 'kh.edu.istad:payment-service-persistence'
+    implementation 'kh.edu.istad:payment-service-restapi'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+}

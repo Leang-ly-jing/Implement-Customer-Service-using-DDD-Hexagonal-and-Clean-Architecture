@@ -1,0 +1,42 @@
+package kh.edu.istad.platform.restapi.mapper;
+
+import kh.edu.istad.platform.application.dto.ProductCommand;
+import kh.edu.istad.platform.application.dto.RegisterBusinessCommand;
+import kh.edu.istad.platform.application.dto.RegisterBusinessResult;
+import kh.edu.istad.platform.restapi.dto.ProductRequest;
+import kh.edu.istad.platform.restapi.dto.RegisterBusinessRequest;
+import kh.edu.istad.platform.restapi.dto.RegisterBusinessResponse;
+import org.springframework.stereotype.Component;
+
+@Component
+public class BusinessWebMapper {
+
+    public RegisterBusinessCommand toCommand(RegisterBusinessRequest request) {
+        return new RegisterBusinessCommand(
+                request.legalName(),
+                request.displayName(),
+                request.email(),
+                request.phoneNumber(),
+                request.products() != null ? request.products().stream().map(this::toProductCommand).toList() : null
+        );
+    }
+
+    public RegisterBusinessResponse toResponse(RegisterBusinessResult result) {
+        return new RegisterBusinessResponse(
+                result.businessId(),
+                result.legalName(),
+                result.displayName(),
+                result.active(),
+                result.message()
+        );
+    }
+
+    private ProductCommand toProductCommand(ProductRequest request) {
+        return new ProductCommand(
+                request.name(),
+                request.price(),
+                request.quantity(),
+                request.available()
+        );
+    }
+}

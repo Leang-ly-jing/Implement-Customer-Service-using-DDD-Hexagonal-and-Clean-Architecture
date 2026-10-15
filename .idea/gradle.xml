@@ -28,6 +28,8 @@
                 <projects>
                   <project path="$PROJECT_DIR$/microservice/business-service" />
                   <project path="$PROJECT_DIR$/microservice/business-service/business-service-domain" />
+                  <project path="$PROJECT_DIR$/microservice/business-service/business-service-domain/business-application-service" />
+                  <project path="$PROJECT_DIR$/microservice/business-service/business-service-domain/business-core-domain" />
                   <project path="$PROJECT_DIR$/microservice/business-service/business-service-main" />
                   <project path="$PROJECT_DIR$/microservice/business-service/business-service-message" />
                   <project path="$PROJECT_DIR$/microservice/business-service/business-service-persistence" />
@@ -60,6 +62,12 @@
               <build path="$PROJECT_DIR$/microservice/payment-service" name="payment-service">
                 <projects>
                   <project path="$PROJECT_DIR$/microservice/payment-service" />
+                  <project path="$PROJECT_DIR$/microservice/payment-service/payment-service-domain" />
+                  <project path="$PROJECT_DIR$/microservice/payment-service/payment-service-domain/payment-application-service" />
+                  <project path="$PROJECT_DIR$/microservice/payment-service/payment-service-domain/payment-core-domain" />
+                  <project path="$PROJECT_DIR$/microservice/payment-service/payment-service-main" />
+                  <project path="$PROJECT_DIR$/microservice/payment-service/payment-service-persistence" />
+                  <project path="$PROJECT_DIR$/microservice/payment-service/payment-service-restapi" />
                 </projects>
               </build>
             </builds>
@@ -76,6 +84,8 @@
             <option value="$PROJECT_DIR$/microservice" />
             <option value="$PROJECT_DIR$/microservice/business-service" />
             <option value="$PROJECT_DIR$/microservice/business-service/business-service-domain" />
+            <option value="$PROJECT_DIR$/microservice/business-service/business-service-domain/business-application-service" />
+            <option value="$PROJECT_DIR$/microservice/business-service/business-service-domain/business-core-domain" />
             <option value="$PROJECT_DIR$/microservice/business-service/business-service-main" />
             <option value="$PROJECT_DIR$/microservice/business-service/business-service-message" />
             <option value="$PROJECT_DIR$/microservice/business-service/business-service-persistence" />
@@ -96,6 +106,12 @@
             <option value="$PROJECT_DIR$/microservice/order-service/order-service-persistence" />
             <option value="$PROJECT_DIR$/microservice/order-service/order-service-restapi" />
             <option value="$PROJECT_DIR$/microservice/payment-service" />
+            <option value="$PROJECT_DIR$/microservice/payment-service/payment-service-domain" />
+            <option value="$PROJECT_DIR$/microservice/payment-service/payment-service-domain/payment-application-service" />
+            <option value="$PROJECT_DIR$/microservice/payment-service/payment-service-domain/payment-core-domain" />
+            <option value="$PROJECT_DIR$/microservice/payment-service/payment-service-main" />
+            <option value="$PROJECT_DIR$/microservice/payment-service/payment-service-persistence" />
+            <option value="$PROJECT_DIR$/microservice/payment-service/payment-service-restapi" />
           </set>
         </option>
         <option name="myGradleHome" value="" />
