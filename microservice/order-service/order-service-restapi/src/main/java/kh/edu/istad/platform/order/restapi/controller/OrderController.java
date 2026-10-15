@@ -1,6 +1,7 @@
 package kh.edu.istad.platform.order.restapi.controller;
 
 
+import jakarta.validation.Valid;
 import kh.edu.istad.platform.order.domain.dto.CreateOrderResult;
 import kh.edu.istad.platform.order.domain.usecase.CreateOrderUseCase;
 import kh.edu.istad.platform.order.restapi.dto.CreateOrderRequest;
@@ -19,7 +20,7 @@ public class OrderController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public CreateOrderResponse createOrder(@RequestBody
+    public CreateOrderResponse createOrder(@Valid @RequestBody
                                            CreateOrderRequest createOrderRequest){
         CreateOrderResult result = createOrderUseCase.execute(
                 orderWebMapper.toCommand(createOrderRequest)

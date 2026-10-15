@@ -1,5 +1,6 @@
 package kh.edu.istad.platform.payment.restapi.controller;
 
+import jakarta.validation.Valid;
 import kh.edu.istad.platform.application.usecase.CreateCreditEntryUseCase;
 import kh.edu.istad.platform.application.usecase.GetCreditBalanceUseCase;
 import kh.edu.istad.platform.application.usecase.ProcessPaymentUseCase;
@@ -27,20 +28,20 @@ public class PaymentController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public Mono<ProcessPaymentResponse> processPayment(@RequestBody ProcessPaymentRequest request) {
+    public Mono<ProcessPaymentResponse> processPayment(@Valid @RequestBody ProcessPaymentRequest request) {
         return processPaymentUseCase.execute(paymentWebMapper.toCommand(request))
                 .map(paymentWebMapper::toResponse);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/credit")
-    public Mono<CreditBalanceResponse> createCredit(@RequestBody CreateCreditRequest request) {
+    public Mono<CreditBalanceResponse> createCredit(@Valid @RequestBody CreateCreditRequest request) {
         return createCreditEntryUseCase.execute(paymentWebMapper.toCommand(request))
                 .map(paymentWebMapper::toResponse);
     }
 
     @GetMapping("/credit/{customerId}")
-    public Mono<CreditBalanceResponse> getCreditBalance( @PathVariable("customerId") UUID customerId) {
+    public Mono<CreditBalanceResponse> getCreditBalance(@PathVariable("customerId") UUID customerId) {
         return getCreditBalanceUseCase.execute(customerId)
                 .map(paymentWebMapper::toResponse);
     }

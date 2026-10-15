@@ -1,5 +1,6 @@
 package kh.edu.istad.platform.restapi.controller;
 
+import jakarta.validation.Valid;
 import kh.edu.istad.platform.application.usecase.RegisterBusinessUseCase;
 import kh.edu.istad.platform.restapi.dto.RegisterBusinessRequest;
 import kh.edu.istad.platform.restapi.dto.RegisterBusinessResponse;
@@ -19,7 +20,7 @@ public class BusinessController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public Mono<RegisterBusinessResponse> registerBusiness(@RequestBody RegisterBusinessRequest request) {
+    public Mono<RegisterBusinessResponse> registerBusiness(@Valid @RequestBody RegisterBusinessRequest request) {
         return registerBusinessUseCase.execute(businessWebMapper.toCommand(request))
                 .map(businessWebMapper::toResponse);
     }
