@@ -1,6 +1,7 @@
 package kh.edu.istad.platform.customer.domain.usecase;
 
 import kh.edu.istad.common.domain.valueobject.CustomerId;
+import kh.edu.istad.platform.customer.domain.dto.CustomerStatistic;
 import kh.edu.istad.platform.customer.domain.dto.Filtering;
 import kh.edu.istad.platform.customer.domain.entity.Customer;
 import kh.edu.istad.platform.customer.domain.port.out.CustomerRepository;
@@ -27,8 +28,11 @@ public class QueryCustomerUseCase {
         return customerRepository.findWithFilter(filtering, pageable);
     }
 
-
     public Flux<Customer> query(){
         return customerRepository.query();
+    }
+
+    public Flux<CustomerStatistic> getStatistics() {
+        return customerRepository.getStatistics();
     }
 }

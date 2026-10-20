@@ -2,6 +2,8 @@ package kh.edu.istad.platform.customer.restapi.controller;
 
 import jakarta.validation.Valid;
 import kh.edu.istad.common.domain.valueobject.CustomerId;
+import kh.edu.istad.common.domain.valueobject.CustomerSegmentId;
+import kh.edu.istad.platform.customer.domain.dto.CustomerStatistic;
 import kh.edu.istad.platform.customer.domain.dto.Filtering;
 import kh.edu.istad.platform.customer.domain.dto.UpdateCustomerCommand;
 import kh.edu.istad.platform.customer.domain.dto.UpdateCustomerResult;
@@ -41,14 +43,21 @@ public class CustomerController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public Mono<Customer> createCustomer(
-            @RequestBody CustomerCreateRequest request
-            ) {
-        return createCustomerUseCase.create(customerWebMapper.toDomain(request));
+            @Valid @RequestBody CustomerCreateRequest request
+    ) {
+        Customer customer = customerWebMapper.toDomain(request);
+        CustomerSegmentId segmentId = new CustomerSegmentId(request.segmentId());
+        return createCustomerUseCase.create(customer, segmentId);
     }
 
     @GetMapping
     public Flux<Customer> findAll(){
         return queryCustomerUseCase.findAll();
+    }
+
+    @GetMapping("/statistics")
+    public Flux<CustomerStatistic> getStatistics() {
+        return queryCustomerUseCase.getStatistics();
     }
 
     @GetMapping("/{id}")
@@ -107,6 +116,4 @@ public class CustomerController {
     public Flux<Customer> query(){
         return queryCustomerUseCase.query();
     }
-
-
 }
