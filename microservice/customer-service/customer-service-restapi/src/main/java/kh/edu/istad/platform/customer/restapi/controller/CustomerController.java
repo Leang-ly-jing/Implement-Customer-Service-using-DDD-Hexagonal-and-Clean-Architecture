@@ -1,63 +1,112 @@
 package kh.edu.istad.platform.customer.restapi.controller;
 
-import kh.edu.istad.platform.customer.domain.dto.DeactivateCustomerCommand;
-import kh.edu.istad.platform.customer.domain.dto.DeactivateCustomerResult;
-import kh.edu.istad.platform.customer.domain.dto.InitiateCustomerResult;
+import jakarta.validation.Valid;
+import kh.edu.istad.common.domain.valueobject.CustomerId;
+import kh.edu.istad.platform.customer.domain.dto.Filtering;
+import kh.edu.istad.platform.customer.domain.dto.UpdateCustomerCommand;
 import kh.edu.istad.platform.customer.domain.dto.UpdateCustomerResult;
+import kh.edu.istad.platform.customer.domain.entity.Customer;
+import kh.edu.istad.platform.customer.domain.usecase.CreateCustomerUseCase;
 import kh.edu.istad.platform.customer.domain.usecase.DeactivateCustomerUseCase;
-import kh.edu.istad.platform.customer.domain.usecase.InitiateCustomerUseCase;
+import kh.edu.istad.platform.customer.domain.usecase.QueryCustomerUseCase;
 import kh.edu.istad.platform.customer.domain.usecase.UpdateCustomerUseCase;
-import kh.edu.istad.platform.customer.restapi.dto.CustomerDeactivateResponse;
-import kh.edu.istad.platform.customer.restapi.dto.CustomerInitiateRequest;
-import kh.edu.istad.platform.customer.restapi.dto.CustomerInitiateResponse;
+import kh.edu.istad.platform.customer.restapi.dto.CustomerCreateRequest;
 import kh.edu.istad.platform.customer.restapi.dto.CustomerUpdateRequest;
-import kh.edu.istad.platform.customer.restapi.dto.CustomerUpdateResponse;
+import kh.edu.istad.platform.customer.restapi.dto.PaginatedResponse;
+import kh.edu.istad.platform.customer.restapi.filter.FilteringFactory;
 import kh.edu.istad.platform.customer.restapi.mapper.CustomerWebMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import java.util.List;
 import java.util.UUID;
+
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/customers")
 public class CustomerController {
-
-    private final InitiateCustomerUseCase initiateCustomerUseCase;
+    private final CreateCustomerUseCase createCustomerUseCase;
+    private final QueryCustomerUseCase queryCustomerUseCase;
+    private final CustomerWebMapper customerWebMapper;
     private final UpdateCustomerUseCase updateCustomerUseCase;
     private final DeactivateCustomerUseCase deactivateCustomerUseCase;
-    private final CustomerWebMapper customerWebMapper;
+
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public CustomerInitiateResponse initiateCustomer(
-            @RequestBody CustomerInitiateRequest customerInitiateRequest
-    ){
-        InitiateCustomerResult result = initiateCustomerUseCase.execute(
-                customerWebMapper.toCommand(customerInitiateRequest)
-        );
-        return customerWebMapper.toResponse(result);
+    public Mono<Customer> createCustomer(
+            @RequestBody CustomerCreateRequest request
+            ) {
+        return createCustomerUseCase.create(customerWebMapper.toDomain(request));
     }
 
-    @PatchMapping("/{customerId}")
-    public CustomerUpdateResponse updateCustomer(
-            @PathVariable("customerId") UUID customerId,
-            @RequestBody CustomerUpdateRequest customerUpdateRequest
-    ){
-        UpdateCustomerResult result = updateCustomerUseCase.execute(
-                customerWebMapper.toUpdateCommand(customerId, customerUpdateRequest)
-        );
-        return customerWebMapper.toUpdateResponse(result);
+    @GetMapping
+    public Flux<Customer> findAll(){
+        return queryCustomerUseCase.findAll();
     }
 
-    @PatchMapping("/{customerId}/deactivate")
-    public CustomerDeactivateResponse deactivateCustomer(
-            @PathVariable("customerId") UUID customerId
-    ){
-        DeactivateCustomerResult result = deactivateCustomerUseCase.execute(
-                new DeactivateCustomerCommand(customerId)
-        );
-        return customerWebMapper.toDeactivateResponse(result);
+    @GetMapping("/{id}")
+    public Mono<Customer> findById(@PathVariable("id") UUID id){
+        return queryCustomerUseCase.findById(new CustomerId(id));
     }
+
+    @PutMapping("/{id}")
+    public Mono<UpdateCustomerResult> updateCustomer(
+            @PathVariable("id") UUID id,
+            @Valid @RequestBody CustomerUpdateRequest request
+    ) {
+        UpdateCustomerCommand command = new UpdateCustomerCommand(
+                id,
+                request.familyName(),
+                request.givenName()
+        );
+        return updateCustomerUseCase.execute(command);
+    }
+
+
+    @PatchMapping("/{id}/deactivate")
+    public Mono<Customer> deactivateCustomer(@PathVariable("id") UUID id) {
+        return deactivateCustomerUseCase.deactivate(id);
+    }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    public Mono<Void> deleteCustomer(@PathVariable("id") UUID id) {
+        return deactivateCustomerUseCase.deleteById(id);
+    }
+
+
+    @GetMapping("/filter")
+    public Mono<PaginatedResponse<Customer>> getCustomersWithFilter(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "filter", required = false) List<String> filter
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Filtering filtering = FilteringFactory.parseFromParams(filter, Customer.class);
+        return queryCustomerUseCase.findWithFilter(filtering, pageable)
+                .map(all -> PaginatedResponse.<Customer>builder()
+                        .currentPage(all.getNumber())
+                        .pageSize(all.getSize())
+                        .totalItems(all.getTotalElements())
+                        .totalPages(all.getTotalPages())
+                        .items(all.getContent())
+                        .hasNext(all.hasNext())
+                        .build());
+    }
+
+
+
+
+    @GetMapping("/query")
+    public Flux<Customer> query(){
+        return queryCustomerUseCase.query();
+    }
+
+
 }

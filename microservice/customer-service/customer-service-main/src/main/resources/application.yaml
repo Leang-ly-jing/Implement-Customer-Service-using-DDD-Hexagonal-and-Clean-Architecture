@@ -1,5 +1,7 @@
 server:
   port: 9090
+  tomcat:
+    relaxed-query-chars: '|,<,>,[,],{,}'
 
 spring:
   datasource:
@@ -11,3 +13,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
+
+  # Move mongodb here:
+  mongodb:
+    uri: mongodb://mongod:mongod@localhost:2026/customer_db?authSource=admin&uuidRepresentation=standard
+
+  data:
+    mongodb:
+      auto-index-creation: true
+      uuid-representation: standard

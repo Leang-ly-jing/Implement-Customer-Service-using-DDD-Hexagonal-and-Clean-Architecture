@@ -1,0 +1,14 @@
+package kh.edu.istad.platform.customer.restapi.dto;
+
+import java.util.UUID;
+
+public record CustomerCreateResponse (
+        UUID customerId,
+        String userName,
+        String familyName,
+        String givenName,
+        String email,
+        String phoneNumber
+
+){
+}
