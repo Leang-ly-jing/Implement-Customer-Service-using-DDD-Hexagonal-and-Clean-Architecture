@@ -2,6 +2,8 @@ server:
   port: 9191
 
 spring:
+  application:
+    name: order-service
   datasource:
     url: ${URL}
     username: ${USERNAME}
@@ -11,3 +13,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+services:
+  customer:
+    url: http://localhost:9090
+  business:
+    url: http://localhost:9292
+  payment:
+    url: http://localhost:9393

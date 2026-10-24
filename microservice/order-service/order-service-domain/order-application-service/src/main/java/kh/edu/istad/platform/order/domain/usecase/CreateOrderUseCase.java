@@ -41,8 +41,7 @@ public class CreateOrderUseCase {
     }
 
     private void checkCustomer(UUID customerId) {
-        Optional<Customer> customer = customerRepository.findCustomer(customerId);
-        if (customer.isEmpty()) {
+        if (!customerRepository.exists(customerId)) {
             log.warn("Could not find customer with id: {}", customerId);
             throw new OrderDomainException("Could not find customer with id: " + customerId);
         }

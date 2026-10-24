@@ -15,13 +15,11 @@ public interface CustomerPersistenceMapper {
     @Mapping(source = "id.value", target = "id")
     @Mapping(source = "email.value", target = "email")
     @Mapping(source = "phoneNumber.value", target = "phoneNumber")
-    @Mapping(source = "segment.id", target = "segmentId")
     CustomerDocument toDocument(Customer customer);
 
     @Mapping(source = "id", target = "id.value")
     @Mapping(source = "email", target = "email.value")
     @Mapping(source = "phoneNumber", target = "phoneNumber.value")
-    @Mapping(source = "segmentId", target = "segment")
     Customer toDomain(CustomerDocument customerDocument);
 
     @Mapping(source = "id.value", target = "id")

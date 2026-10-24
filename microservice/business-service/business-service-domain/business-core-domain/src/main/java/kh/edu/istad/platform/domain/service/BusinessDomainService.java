@@ -8,5 +8,8 @@ import java.util.List;
 
 public interface BusinessDomainService {
     BusinessRegisteredEvent validateAndInitiateBusiness(Business business);
+
+
+
     OrderApprovalEvent validateOrder(Business business, List<String> failureMessages);
 }
