@@ -1,6 +1,7 @@
 package kh.edu.istad.platform.order.client;
 
 import kh.edu.istad.platform.order.domain.port.out.CustomerRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,10 @@ public class CustomerRestAdapter implements CustomerRepository {
 
     private final RestClient restClient;
 
-    public CustomerRestAdapter(RestClient.Builder builder, @Value("${services.customer.url}") String baseUrl) {
+    public CustomerRestAdapter(
+            @Qualifier("loadBalancedRestClientBuilder") RestClient.Builder builder,
+            @Value("${services.customer.url}") String baseUrl
+    ) {
         this.restClient = builder.baseUrl(baseUrl).build();
     }
 
