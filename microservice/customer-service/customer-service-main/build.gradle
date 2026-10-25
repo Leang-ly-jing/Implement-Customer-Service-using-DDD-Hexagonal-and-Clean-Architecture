@@ -9,5 +9,7 @@ dependencies {
     implementation 'kh.edu.istad:customer-service-persistence'
     implementation 'kh.edu.istad:customer-service-restapi'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     runtimeOnly 'org.postgresql:postgresql'
 }

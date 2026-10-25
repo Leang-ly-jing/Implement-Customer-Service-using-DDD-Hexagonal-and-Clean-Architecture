@@ -16,8 +16,24 @@ spring:
 
 services:
   customer:
-    url: http://localhost:9090
+    url: http://customer-service
   business:
-    url: http://localhost:9292
+    url: http://business-service
   payment:
-    url: http://localhost:9393
+    url: http://payment-service
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
