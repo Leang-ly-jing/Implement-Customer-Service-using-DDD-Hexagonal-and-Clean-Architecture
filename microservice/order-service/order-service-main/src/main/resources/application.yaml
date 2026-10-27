@@ -1,6 +1,5 @@
 server:
   port: 9191
-
 spring:
   datasource:
     url: ${URL}
@@ -11,3 +10,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  application:
+    name: order-service
+
+  cloud:
+    consul:
+      discovery:
+        prefer-ip-address: true
+        health-check-url: http://host.docker.internal:9191/actuator/health

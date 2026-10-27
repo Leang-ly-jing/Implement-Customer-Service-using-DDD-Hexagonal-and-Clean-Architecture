@@ -1,5 +1,6 @@
 plugins {
     id 'springboot-common-conventions'
+    id 'spring-cloud-common-conventions'
 }
 
 dependencies {
@@ -9,5 +10,7 @@ dependencies {
     implementation 'kh.edu.istad:customer-service-persistence'
     implementation 'kh.edu.istad:customer-service-restapi'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     runtimeOnly 'org.postgresql:postgresql'
 }

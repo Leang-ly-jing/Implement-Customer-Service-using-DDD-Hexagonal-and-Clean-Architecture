@@ -9,6 +9,14 @@ spring:
     username: ${USERNAME}
     password: ${PASSWORD}
     driver-class-name: org.postgresql.Driver
+  application:
+    name: customer-service
+  cloud:
+    consul:
+      discovery:
+        prefer-ip-address: true
+        health-check-url: http://host.docker.internal:9090/actuator/health
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -23,3 +31,4 @@ spring:
     mongodb:
       auto-index-creation: true
       uuid-representation: standard
+

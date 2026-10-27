@@ -21,8 +21,8 @@ dependencies {
 
     // MapStruct Configuration
     implementation 'org.mapstruct:mapstruct:1.6.3'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3' // 👈 Changed from implementation to annotationProcessor
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // 👈 Changed from implementation to annotationProcessor
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
     // Starters
     implementation 'org.springframework.boot:spring-boot-starter-logging'
