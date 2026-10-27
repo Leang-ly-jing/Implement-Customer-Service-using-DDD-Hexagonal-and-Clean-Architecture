@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class BeanConfig {
@@ -25,8 +26,7 @@ public class BeanConfig {
 
     @Bean
     @LoadBalanced
-    @Qualifier("loadBalancedRestClientBuilder")
-    public RestClient.Builder loadBalancedRestClientBuilder() {
-        return RestClient.builder();
+    public WebClient.Builder loadBalancedWebClientBuilder() {
+        return WebClient.builder();
     }
 }
