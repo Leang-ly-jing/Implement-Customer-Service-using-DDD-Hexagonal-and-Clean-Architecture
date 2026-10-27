@@ -2,7 +2,7 @@ package kh.edu.istad.common.domain.valueobject;
 
 public enum OrderStatus {
     PENDING,
-    PAIN,
+    PAID,
     APPROVED,
     CANCELLING,
     CANCELLED

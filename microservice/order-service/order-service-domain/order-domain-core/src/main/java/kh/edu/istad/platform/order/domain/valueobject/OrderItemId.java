@@ -1,4 +1,8 @@
 package kh.edu.istad.platform.order.domain.valueobject;
 
-public record OrderItemId() {
+import java.util.UUID;
+
+public record OrderItemId(
+        UUID value
+) {
 }
