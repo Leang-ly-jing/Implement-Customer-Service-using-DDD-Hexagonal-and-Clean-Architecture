@@ -1,6 +1,7 @@
-server:
-  port: 9191
+
 spring:
+  profiles:
+    active: dev
   datasource:
     url: ${URL}
     username: ${USERNAME}
@@ -12,9 +13,18 @@ spring:
     show-sql: true
   application:
     name: order-service
-
+  config:
+    import:
+      - "optional:consul:"
   cloud:
     consul:
       discovery:
         prefer-ip-address: true
         health-check-url: http://host.docker.internal:9191/actuator/health
+
+      config:
+        format: yaml
+        data-key: data
+        watch:
+          enabled: true
+

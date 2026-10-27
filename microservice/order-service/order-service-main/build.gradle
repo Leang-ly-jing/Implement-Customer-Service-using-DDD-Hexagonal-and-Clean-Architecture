@@ -9,6 +9,7 @@ ext {
 
 
 dependencies {
+
     implementation 'kh.edu.istad:order-domain-core'
     implementation 'kh.edu.istad:order-service-client'
     implementation 'kh.edu.istad:order-application-service'
@@ -17,6 +18,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.cloud:spring-cloud-starter-consul-config'
     runtimeOnly 'org.postgresql:postgresql'
 }
 dependencyManagement {
