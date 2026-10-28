@@ -2,12 +2,15 @@ server:
   port: 9393
 
 spring:
-  datasource:
-    url: ${URL}
-    username: ${USERNAME}
-    password: ${PASSWORD}
+  r2dbc:
+    url: r2dbc:postgresql://localhost:9543/db_order
+    username: iteuser
+    password: qwerqwer
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
     driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+    url: jdbc:postgresql://localhost:9543/db_order
+    user: iteuser
+    password: qwerqwer
+    clear-checksums: true

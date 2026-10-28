@@ -3,16 +3,13 @@ plugins {
 }
 
 dependencies {
-    implementation 'kh.edu.istad:customer-domain-core'
-    implementation 'kh.edu.istad:customer-application-service'
-    implementation 'kh.edu.istad:customer-service-message'
-    implementation 'kh.edu.istad:customer-service-persistence'
-    implementation 'kh.edu.istad:customer-service-restapi'
+    implementation 'kh.edu.istad:order-domain-core'
+    implementation 'kh.edu.istad:order-application-service'
+    implementation 'kh.edu.istad:order-service-persistence'
+    implementation 'kh.edu.istad:order-service-restapi'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
     implementation 'org.liquibase:liquibase-core'
-
 }
