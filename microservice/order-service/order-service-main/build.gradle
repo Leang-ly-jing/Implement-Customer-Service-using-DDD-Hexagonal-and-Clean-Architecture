@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation 'kh.edu.istad:istad-common-swagger'
     implementation 'kh.edu.istad:order-domain-core'
     implementation 'kh.edu.istad:order-application-service'
     implementation 'kh.edu.istad:order-service-persistence'
