@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 public class WebConfig {
 
     @Bean
-    public DomainExceptionHandler bean(){
+    public DomainExceptionHandler domainExceptionHandler(){
         return new DomainExceptionHandler();
     }
 
