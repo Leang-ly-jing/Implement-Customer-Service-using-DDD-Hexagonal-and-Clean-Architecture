@@ -1,7 +1,8 @@
 package kh.edu.istad.platform.order.persistence.entity;
 
-import jakarta.persistence.*;
+
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -9,18 +10,17 @@ import java.util.UUID;
 @Setter
 @Getter
 @NoArgsConstructor@AllArgsConstructor
-@Entity
+@Document
 @Builder
-@Table(name = "order_items")
+
 public class OrderItemEntity {
-    @Id
+
     private UUID id;
     private UUID productId;
     private BigDecimal price;
     private Integer quantity;
     private BigDecimal subTotal;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
+
     private OrderEntity order;
 }

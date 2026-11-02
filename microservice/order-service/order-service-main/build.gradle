@@ -14,7 +14,7 @@ dependencies {
     implementation 'kh.edu.istad:order-application-service'
     implementation 'kh.edu.istad:order-service-persistence'
     implementation 'kh.edu.istad:order-service-restapi'
-    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     runtimeOnly 'org.postgresql:postgresql'

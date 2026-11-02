@@ -15,6 +15,8 @@ import kh.edu.istad.platform.order.domain.service.OrderDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,16 +30,18 @@ public class CreateOrderUseCase {
     private final CustomerRepository customerRepository;
     private final BusinessRepository businessRepository;
     private final CreateOrderMapper createOrderMapper;
-    public CreateOrderResult execute(CreateOrderCommand command) {
+    public Mono<CreateOrderResult> execute(CreateOrderCommand command) {
         checkCustomer(command.customerId());
         Business business = checkBusiness(command);
         Order order = createOrderMapper.toOrder(command);
 
         OrderCreatedEvent orderCreatedEvent = orderDomainService.validateAndInitiateOrder(order, business);
-        Order savedOrder = orderRepository.save(orderCreatedEvent.getOrder());
 
-        log.info("Order is created with id: {}", savedOrder.getId().value());
-        return createOrderMapper.toResult(savedOrder, "Order Created Successfully");
+        return orderRepository.save(orderCreatedEvent.getOrder())
+                .map(savedOrder -> {
+                    log.info("Order is created with id: {}", savedOrder.getId().value());
+                    return createOrderMapper.toResult(savedOrder, "Order Created Successfully");
+                });
     }
 
     private void checkCustomer(UUID customerId) {

@@ -10,6 +10,7 @@ import kh.edu.istad.platform.order.restapi.mapper.OrderWebMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,12 +21,9 @@ public class OrderController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public CreateOrderResponse createOrder(@Valid @RequestBody
-                                           CreateOrderRequest createOrderRequest){
-        CreateOrderResult result = createOrderUseCase.execute(
-                orderWebMapper.toCommand(createOrderRequest)
-        );
-        return orderWebMapper.toResponse(result);
+    public Mono<CreateOrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest createOrderRequest) {
+        return createOrderUseCase.execute(orderWebMapper.toCommand(createOrderRequest))
+                .map(orderWebMapper::toResponse);
     }
 
 

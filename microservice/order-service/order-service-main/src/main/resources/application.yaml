@@ -1,18 +1,15 @@
 server:
   port: 9191
+
 spring:
-  datasource:
-    url: ${URL}
-    username: ${USERNAME}
-    password: ${PASSWORD}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
   application:
     name: order-service
-
+  mongodb:
+    uri: mongodb://mongod:mongod@localhost:2026/order_db?authSource=admin&uuidRepresentation=standard
+  data:
+    mongodb:
+      auto-index-creation: true
+      uuid-representation: standard
   cloud:
     consul:
       discovery:

@@ -4,11 +4,11 @@ server:
     relaxed-query-chars: '|,<,>,[,],{,}'
 
 spring:
-  datasource:
-    url: ${URL}
-    username: ${USERNAME}
-    password: ${PASSWORD}
-    driver-class-name: org.postgresql.Driver
+#  datasource:
+#    url: ${URL}
+#    username: ${USERNAME}
+#    password: ${PASSWORD}
+#    driver-class-name: org.postgresql.Driver
   application:
     name: customer-service
   cloud:
@@ -17,11 +17,11 @@ spring:
         prefer-ip-address: true
         health-check-url: http://host.docker.internal:9090/actuator/health
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    open-in-view: false
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    open-in-view: false
 
   # Move mongodb here:
   mongodb:

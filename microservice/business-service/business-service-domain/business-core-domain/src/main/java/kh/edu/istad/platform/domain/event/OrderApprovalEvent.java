@@ -7,7 +7,7 @@ import kh.edu.istad.platform.domain.entity.OrderApproval;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-public abstract class OrderApprovalEvent implements DomainEvent<OrderApproval> {
+public abstract class       OrderApprovalEvent implements DomainEvent<OrderApproval> {
     private final OrderApproval orderApproval;
     private final BusinessId businessId;
     private final List<String> failureMessages;
