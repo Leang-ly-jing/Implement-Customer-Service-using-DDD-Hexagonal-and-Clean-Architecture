@@ -23,6 +23,7 @@
               <build path="$PROJECT_DIR$/microservice" name="microservice">
                 <projects>
                   <project path="$PROJECT_DIR$/microservice" />
+                  <project path="$PROJECT_DIR$/microservice/gateway-server" />
                 </projects>
               </build>
               <build path="$PROJECT_DIR$/microservice/business-service" name="business-service">
@@ -85,6 +86,7 @@
             <option value="$PROJECT_DIR$/microservice/customer-service/customer-service-message" />
             <option value="$PROJECT_DIR$/microservice/customer-service/customer-service-persistence" />
             <option value="$PROJECT_DIR$/microservice/customer-service/customer-service-restapi" />
+            <option value="$PROJECT_DIR$/microservice/gateway-server" />
             <option value="$PROJECT_DIR$/microservice/order-service" />
             <option value="$PROJECT_DIR$/microservice/order-service/order-service-domain" />
             <option value="$PROJECT_DIR$/microservice/order-service/order-service-domain/order-application-service" />

@@ -1,0 +1,13 @@
+plugins {
+    id 'spring-cloud-common-conventions'
+}
+
+
+
+dependencies {
+
+}
+
+test {
+    useJUnitPlatform()
+}
