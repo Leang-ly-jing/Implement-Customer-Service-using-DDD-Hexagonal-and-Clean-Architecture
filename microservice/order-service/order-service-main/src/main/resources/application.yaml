@@ -15,3 +15,8 @@ spring:
       discovery:
         prefer-ip-address: true
         health-check-url: http://host.docker.internal:9191/actuator/health
+
+#  http:
+#    serviceclient:
+#      customer-service:
+#        base-url: http://customer-service

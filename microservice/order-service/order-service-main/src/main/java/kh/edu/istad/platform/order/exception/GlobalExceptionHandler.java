@@ -1,0 +1,7 @@
+package kh.edu.istad.platform.order.exception;
+
+public class GlobalExceptionHandler extends RuntimeException {
+    public GlobalExceptionHandler(String message) {
+        super(message);
+    }
+}

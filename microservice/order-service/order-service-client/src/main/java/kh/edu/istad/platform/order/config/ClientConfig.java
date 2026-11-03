@@ -1,28 +1,107 @@
 package kh.edu.istad.platform.order.config;
 
+import kh.edu.istad.platform.order.exception.DownStreamServiceException;
+import kh.edu.istad.platform.order.httpclient.BusinessHttpClient;
 import kh.edu.istad.platform.order.httpclient.CustomerHttpClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultReactiveOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.web.reactive.function.client.support.OAuth2WebClientHttpServiceGroupConfigurer;
+import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
+import org.springframework.web.reactive.function.client.support.WebClientHttpServiceGroupConfigurer;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+import org.springframework.web.service.registry.HttpServiceGroup;
+import org.springframework.web.service.registry.ImportHttpServices;
+
+
 
 @Configuration
-@RequiredArgsConstructor
+
+@ImportHttpServices(
+        group = "customer-service",
+        types = {CustomerHttpClient.class},
+        clientType = HttpServiceGroup.ClientType.WEB_CLIENT)
+//@RequiredArgsConstructor
 public class ClientConfig {
-
-    public final WebClient.Builder webClient;
     @Bean
-    public CustomerHttpClient customerHttpClient(){
-        WebClient customer = webClient
-                .baseUrl("http://customer-service")
-                .build();
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-                .builderFor(WebClientAdapter.create(customer))
-                .build();
+    public ReactiveOAuth2AuthorizedClientManager authorizedClientManager(
+            ReactiveClientRegistrationRepository clientRegistrationRepository,
+            ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
 
-        return factory.createClient(CustomerHttpClient.class);
+        ReactiveOAuth2AuthorizedClientProvider authorizedClientProvider =
+                ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
+                        .authorizationCode()
+                        .refreshToken()
+                        .clientCredentials()
+                        .build();
+
+        DefaultReactiveOAuth2AuthorizedClientManager authorizedClientManager =
+                new DefaultReactiveOAuth2AuthorizedClientManager(
+                        clientRegistrationRepository, authorizedClientRepository);
+        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+
+        return authorizedClientManager;
+    }
+
+
+    @Bean
+    OAuth2WebClientHttpServiceGroupConfigurer securityConfigurer(
+            ReactiveOAuth2AuthorizedClientManager manager) {
+        return OAuth2WebClientHttpServiceGroupConfigurer.from(manager);
+    }
+
+//    public final WebClient.Builder webClient;
+//    @Bean
+//    public CustomerHttpClient customerHttpClient(){
+//        return createClient("http://customer-service",CustomerHttpClient.class);
+//    }
+//    @Bean
+//    public BusinessHttpClient businessHttpClient(){
+//        return createClient("https://business-service",BusinessHttpClient.class);
+//    }
+//
+//    private <T> T createClient(String baseUrl, Class<T> type){
+//        WebClient wc = webClient
+//                .baseUrl(baseUrl)
+//                .build();
+//
+//        return createClient(wc,type);
+//    }
+//
+//    private <T> T createClient(WebClient wc, Class<T> type){
+//
+//        HttpServiceProxyFactory factory = HttpServiceProxyFactory
+//                .builderFor(WebClientAdapter.create(wc))
+//                .build();
+//        return factory.createClient(type);
+//    }
+
+    @Bean
+    public WebClientHttpServiceGroupConfigurer webClientHttpServiceGroupConfigurer(){
+        return  groups -> {
+            groups.filterByName("customer-service")
+                    .forEachClient(
+                            (group, clientBuilder) -> {
+                                clientBuilder.defaultHeader("User-Agent", "Web Client")
+                                        .defaultStatusHandler(HttpStatusCode::isError,
+                                                clientResponse -> {
+                                                   return clientResponse.createException().map(
+                                                           ex -> new DownStreamServiceException(
+                                                                   "Customer-Service" , ex.getMessage()
+                                                           )
+                                                   );
+                                                });
+                            }
+                    );
+        };
     }
 
 }
