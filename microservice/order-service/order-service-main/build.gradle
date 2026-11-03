@@ -9,6 +9,7 @@ ext {
 
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'kh.edu.istad:istad-common-webflux'
     implementation 'kh.edu.istad:istad-common-swagger'
     implementation 'kh.edu.istad:order-domain-core'

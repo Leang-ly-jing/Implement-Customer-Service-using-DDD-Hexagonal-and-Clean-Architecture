@@ -1,9 +1,7 @@
 package kh.edu.istad.platform.order.config;
 
 import kh.edu.istad.platform.order.exception.DownStreamServiceException;
-import kh.edu.istad.platform.order.httpclient.BusinessHttpClient;
 import kh.edu.istad.platform.order.httpclient.CustomerHttpClient;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
@@ -14,10 +12,7 @@ import org.springframework.security.oauth2.client.registration.ReactiveClientReg
 import org.springframework.security.oauth2.client.web.DefaultReactiveOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.reactive.function.client.support.OAuth2WebClientHttpServiceGroupConfigurer;
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.reactive.function.client.support.WebClientHttpServiceGroupConfigurer;
-import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import org.springframework.web.service.registry.HttpServiceGroup;
 import org.springframework.web.service.registry.ImportHttpServices;
 
@@ -42,7 +37,6 @@ public class ClientConfig {
                         .refreshToken()
                         .clientCredentials()
                         .build();
-
         DefaultReactiveOAuth2AuthorizedClientManager authorizedClientManager =
                 new DefaultReactiveOAuth2AuthorizedClientManager(
                         clientRegistrationRepository, authorizedClientRepository);

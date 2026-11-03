@@ -4,6 +4,23 @@ server:
 spring:
   application:
     name: order-service
+  security:
+    oauth2:
+      client:
+        registration:
+          customer-client:
+            client-id: order-service
+            client-secret: secret
+            authorization-grant-type: client_credentials
+            scope:
+              - customer:read
+              - customer:write
+            provider: auth-server
+
+        provider:
+          auth-server:
+            token-uri: http://localhost:9000/oauth2/token
+
   mongodb:
     uri: mongodb://mongod:mongod@localhost:2026/order_db?authSource=admin&uuidRepresentation=standard
   data:
