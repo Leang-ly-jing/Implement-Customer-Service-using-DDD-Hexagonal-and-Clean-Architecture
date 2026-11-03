@@ -8,11 +8,12 @@ import kh.edu.istad.platform.order.persistence.entity.OrderAddressEntity;
 import kh.edu.istad.platform.order.persistence.entity.OrderEntity;
 import kh.edu.istad.platform.order.persistence.entity.OrderItemEntity;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
-import java.util.Arrays;
+
 import java.util.List;
+
 @Component
 public class OrderPersistenceMapper {
+
     public OrderEntity toEntity(Order order) {
         OrderAddressEntity addressEntity = OrderAddressEntity.builder()
                 .id(order.getDeliveryAddress().id())
@@ -20,30 +21,31 @@ public class OrderPersistenceMapper {
                 .postalCode(order.getDeliveryAddress().postalCode())
                 .city(order.getDeliveryAddress().city())
                 .build();
-        OrderEntity orderEntity = OrderEntity.builder()
-                .id(order.getId().value())
-                .customerId(order.getCustomerId().value())
-                .businessId(order.getBusinessId().value())
-                .trackingId(order.getTrackingId().value())
-                .address(addressEntity)
-                .price(order.getPrice().amount())
-                .orderStatus(order.getOrderStatus())
-                .failureMessages(order.getFailureMessage() != null ?
-                        String.join(",", order.getFailureMessage()) : "")
-                .build();
+
         List<OrderItemEntity> itemEntities = order.getItems().stream()
                 .map(item -> OrderItemEntity.builder()
                         .id(item.getId().value())
-                        .order(orderEntity)
                         .productId(item.getProduct().getId().value())
                         .price(item.getPrice().amount())
                         .quantity(item.getQuantity())
                         .subTotal(item.getSubTotal().amount())
                         .build())
                 .toList();
-        orderEntity.setItems(itemEntities);
-        return orderEntity;
+
+        return OrderEntity.builder()
+                .id(order.getId().value())
+                .customerId(order.getCustomerId().value())
+                .businessId(order.getBusinessId().value())
+                .trackingId(order.getTrackingId().value())
+                .address(addressEntity)
+                .items(itemEntities)
+                .price(order.getPrice().amount())
+                .orderStatus(order.getOrderStatus())
+                .failureMessages(order.getFailureMessage() != null ?
+                        String.join(",", order.getFailureMessage()) : "")
+                .build();
     }
+
     public Order toDomain(OrderEntity entity) {
         StreetAddress deliveryAddress = new StreetAddress(
                 entity.getAddress().getId(),
@@ -51,6 +53,7 @@ public class OrderPersistenceMapper {
                 entity.getAddress().getPostalCode(),
                 entity.getAddress().getCity()
         );
+
         List<OrderItem> items = entity.getItems().stream()
                 .map(item -> OrderItem.Builder.builder()
                         .orderItemId(new OrderItemId(item.getId()))
@@ -60,6 +63,7 @@ public class OrderPersistenceMapper {
                         .subTotal(new Money(item.getSubTotal()))
                         .build())
                 .toList();
+
         return Order.Builder.builder()
                 .orderId(new OrderId(entity.getId()))
                 .customerId(new CustomerId(entity.getCustomerId()))
@@ -69,8 +73,8 @@ public class OrderPersistenceMapper {
                 .items(items)
                 .trackingId(new TrackingId(entity.getTrackingId()))
                 .orderStatus(entity.getOrderStatus())
-                .failureMessage(entity.getFailureMessages() == null || entity.getFailureMessages().isEmpty() ?
-                        new ArrayList<>() : new ArrayList<>(Arrays.asList(entity.getFailureMessages().split(","))))
+                .failureMessage(entity.getFailureMessages() != null && !entity.getFailureMessages().isBlank() ?
+                        List.of(entity.getFailureMessages().split(",")) : List.of())
                 .build();
     }
 }

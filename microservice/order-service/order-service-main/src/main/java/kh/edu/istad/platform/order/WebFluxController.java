@@ -1,6 +1,7 @@
 package kh.edu.istad.platform.order;
 
 
+import kh.edu.istad.platform.order.domain.dto.QueryCustomerResult;
 import kh.edu.istad.platform.order.domain.port.out.client.CustomerServiceClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +20,8 @@ public class WebFluxController {
     }
 
     @GetMapping("customers")
-    public Flux<CustomerServiceClient.CustomerResponse> getCustomers(){
-        return customerServiceClient.getCustomerNames();
+    public Flux<QueryCustomerResult> getCustomers(){
+        return customerServiceClient.getCustomers();
     }
 
 

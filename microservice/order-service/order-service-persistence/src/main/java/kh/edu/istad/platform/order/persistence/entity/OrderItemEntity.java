@@ -21,6 +21,4 @@ public class OrderItemEntity {
     private Integer quantity;
     private BigDecimal subTotal;
 
-
-    private OrderEntity order;
 }
