@@ -7,15 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProvider;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProviderBuilder;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.DefaultReactiveOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.web.reactive.function.client.support.OAuth2WebClientHttpServiceGroupConfigurer;
-import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.support.WebClientAdapter;
+
 import org.springframework.web.reactive.function.client.support.WebClientHttpServiceGroupConfigurer;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import org.springframework.web.service.registry.HttpServiceGroup;
@@ -31,32 +23,32 @@ import org.springframework.web.service.registry.ImportHttpServices;
         clientType = HttpServiceGroup.ClientType.WEB_CLIENT)
 //@RequiredArgsConstructor
 public class ClientConfig {
-    @Bean
-    public ReactiveOAuth2AuthorizedClientManager authorizedClientManager(
-            ReactiveClientRegistrationRepository clientRegistrationRepository,
-            ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
+//    @Bean
+//    public ReactiveOAuth2AuthorizedClientManager authorizedClientManager(
+//            ReactiveClientRegistrationRepository clientRegistrationRepository,
+//            ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
+//
+//        ReactiveOAuth2AuthorizedClientProvider authorizedClientProvider =
+//                ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
+//                        .authorizationCode()
+//                        .refreshToken()
+//                        .clientCredentials()
+//                        .build();
+//
+//        DefaultReactiveOAuth2AuthorizedClientManager authorizedClientManager =
+//                new DefaultReactiveOAuth2AuthorizedClientManager(
+//                        clientRegistrationRepository, authorizedClientRepository);
+//        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+//
+//        return authorizedClientManager;
+//    }
 
-        ReactiveOAuth2AuthorizedClientProvider authorizedClientProvider =
-                ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
-                        .authorizationCode()
-                        .refreshToken()
-                        .clientCredentials()
-                        .build();
 
-        DefaultReactiveOAuth2AuthorizedClientManager authorizedClientManager =
-                new DefaultReactiveOAuth2AuthorizedClientManager(
-                        clientRegistrationRepository, authorizedClientRepository);
-        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
-        return authorizedClientManager;
-    }
-
-
-    @Bean
-    OAuth2WebClientHttpServiceGroupConfigurer securityConfigurer(
-            ReactiveOAuth2AuthorizedClientManager manager) {
-        return OAuth2WebClientHttpServiceGroupConfigurer.from(manager);
-    }
+//    @Bean
+//    OAuth2WebClientHttpServiceGroupConfigurer securityConfigurer(
+//            ReactiveOAuth2AuthorizedClientManager manager) {
+//        return OAuth2WebClientHttpServiceGroupConfigurer.from(manager);
+//    }
 
 //    public final WebClient.Builder webClient;
 //    @Bean

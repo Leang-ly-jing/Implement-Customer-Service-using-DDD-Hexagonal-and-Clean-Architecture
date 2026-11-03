@@ -50,6 +50,11 @@
                   <project path="$PROJECT_DIR$/microservice/customer-service/customer-service-restapi" />
                 </projects>
               </build>
+              <build path="$PROJECT_DIR$/microservice/gateway-server" name="gateway-server">
+                <projects>
+                  <project path="$PROJECT_DIR$/microservice/gateway-server" />
+                </projects>
+              </build>
               <build path="$PROJECT_DIR$/microservice/order-service" name="order-service">
                 <projects>
                   <project path="$PROJECT_DIR$/microservice/order-service" />
@@ -103,6 +108,7 @@
             <option value="$PROJECT_DIR$/microservice/customer-service/customer-service-message" />
             <option value="$PROJECT_DIR$/microservice/customer-service/customer-service-persistence" />
             <option value="$PROJECT_DIR$/microservice/customer-service/customer-service-restapi" />
+            <option value="$PROJECT_DIR$/microservice/gateway-server" />
             <option value="$PROJECT_DIR$/microservice/order-service" />
             <option value="$PROJECT_DIR$/microservice/order-service/order-service-client" />
             <option value="$PROJECT_DIR$/microservice/order-service/order-service-domain" />
