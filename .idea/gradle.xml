@@ -23,7 +23,6 @@
               <build path="$PROJECT_DIR$/microservice" name="microservice">
                 <projects>
                   <project path="$PROJECT_DIR$/microservice" />
-                  <project path="$PROJECT_DIR$/microservice/gateway-server" />
                 </projects>
               </build>
               <build path="$PROJECT_DIR$/microservice/business-service" name="business-service">
@@ -46,6 +45,11 @@
                   <project path="$PROJECT_DIR$/microservice/customer-service/customer-service-message" />
                   <project path="$PROJECT_DIR$/microservice/customer-service/customer-service-persistence" />
                   <project path="$PROJECT_DIR$/microservice/customer-service/customer-service-restapi" />
+                </projects>
+              </build>
+              <build path="$PROJECT_DIR$/microservice/gateway-server" name="gateway-server">
+                <projects>
+                  <project path="$PROJECT_DIR$/microservice/gateway-server" />
                 </projects>
               </build>
               <build path="$PROJECT_DIR$/microservice/order-service" name="order-service">
