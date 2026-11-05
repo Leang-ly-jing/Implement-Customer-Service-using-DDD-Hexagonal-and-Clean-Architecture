@@ -2,9 +2,20 @@ spring:
   application:
     name: iam-service
   security:
+
     oauth2:
       authorizationserver:
         issuer: http://localhost:9000
+      client:
+        registration:
+          github:
+            provider: github
+            client-id:
+            client-secret:
+            client-name:
+            redirect-uri:
+
+
   datasource:
     url: jdbc:postgresql://localhost:9543/db_oauth2
     username: iteuser
