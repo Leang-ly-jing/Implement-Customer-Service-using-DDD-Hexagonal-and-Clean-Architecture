@@ -2,6 +2,11 @@ server:
   port: 9191
 
 spring:
+  grpc:
+    client:
+      channel:
+        customer-service:
+          target: "static://localhost:9098"
   application:
     name: order-service
   mongodb:

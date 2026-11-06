@@ -4,7 +4,10 @@ server:
     relaxed-query-chars: '|,<,>,[,],{,}'
 
 spring:
-#  datasource:
+  grpc:
+    server:
+      port: 9098
+  #  datasource:
 #    url: ${URL}
 #    username: ${USERNAME}
 #    password: ${PASSWORD}

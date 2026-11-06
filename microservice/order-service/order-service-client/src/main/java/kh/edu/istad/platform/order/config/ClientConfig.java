@@ -1,19 +1,16 @@
 package kh.edu.istad.platform.order.config;
 
+import kh.edu.istad.platform.customer.proto.CustomerGrpcServiceGrpc;
 import kh.edu.istad.platform.order.exception.DownStreamServiceException;
-import kh.edu.istad.platform.order.httpclient.BusinessHttpClient;
 import kh.edu.istad.platform.order.httpclient.CustomerHttpClient;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
-
 import org.springframework.web.reactive.function.client.support.WebClientHttpServiceGroupConfigurer;
-import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import org.springframework.web.service.registry.HttpServiceGroup;
 import org.springframework.web.service.registry.ImportHttpServices;
-
-
+import io.grpc.Channel;
+import org.springframework.grpc.client.GrpcChannelFactory;
 
 @Configuration
 
@@ -23,6 +20,13 @@ import org.springframework.web.service.registry.ImportHttpServices;
         clientType = HttpServiceGroup.ClientType.WEB_CLIENT)
 //@RequiredArgsConstructor
 public class ClientConfig {
+
+    @Bean
+    public CustomerGrpcServiceGrpc.CustomerGrpcServiceBlockingStub customerGrpcStub(GrpcChannelFactory channelFactory) {
+        // Creates the channel named "customer-service" from application.yaml
+        Channel channel = channelFactory.createChannel("customer-service");
+        return CustomerGrpcServiceGrpc.newBlockingStub(channel);
+    }
 //    @Bean
 //    public ReactiveOAuth2AuthorizedClientManager authorizedClientManager(
 //            ReactiveClientRegistrationRepository clientRegistrationRepository,
