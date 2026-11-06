@@ -1,0 +1,18 @@
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: java_multiple_files
+      value: true
+    - file_option: java_package
+      value: kh.edu.istad.platform.customer.proto
+
+plugins:
+  - remote: buf.build/protocolbuffers/java
+    out: ../build/generated/sources/proto/main/java
+
+  - remote: buf.build/grpc/java
+    out: ../build/generated/sources/proto/main/grpc
+
+inputs:
+  - directory: proto
