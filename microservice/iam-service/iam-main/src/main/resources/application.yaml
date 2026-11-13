@@ -61,7 +61,7 @@ logging:
 gg:
   jte:
     development-mode: true
-    template-location: microservice/iam-server/iam-web/src/main/jte
+    template-location: microservice/iam-service/iam-web/src/main/jte
 
 telegram:
   bot-username: ${TELEGRAM_BOT_USERNAME}
