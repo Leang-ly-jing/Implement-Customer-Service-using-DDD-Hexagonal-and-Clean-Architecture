@@ -54,11 +54,11 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasAuthority('user:read')")
     public PageResponse<UserSummary> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt,desc") String sort,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Boolean enabled
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "createdAt,desc") String sort,
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "enabled", required = false) Boolean enabled
     ) {
         UserFilterQuery query = new UserFilterQuery(page, size, sort, search, enabled);
         PageResult<UserSummary> pageResult = listUserUseCase.execute(query);
@@ -75,14 +75,14 @@ public class UserController {
 
     @GetMapping("/{uuid}")
     @PreAuthorize("hasAuthority('user:read')")
-    public UserResponse getByUuid(@PathVariable UUID uuid) {
+    public UserResponse getByUuid(@PathVariable("uuid") UUID uuid) {
         UserResult result = getUserUseCase.execute(uuid);
         return userWebMapper.toResponse(result);
     }
 
     @PatchMapping("/{uuid}")
     @PreAuthorize("hasAuthority('user:update')")
-    public UserResponse updateProfile(@PathVariable UUID uuid,
+    public UserResponse updateProfile(@PathVariable("uuid") UUID uuid,
                                       @Valid @RequestBody UpdateUserProfileRequest request) {
         UpdateUserProfileCommand command = userWebMapper.toCommand(uuid, request);
         UserResult result = updateUserProfileUseCase.execute(command);
@@ -92,49 +92,49 @@ public class UserController {
     @DeleteMapping("/{uuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:delete')")
-    public void delete(@PathVariable UUID uuid) {
+    public void delete(@PathVariable("uuid") UUID uuid) {
         deleteUserUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/enable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
-    public void enable(@PathVariable UUID uuid) {
+    public void enable(@PathVariable("uuid") UUID uuid) {
         enableUserUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/disable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
-    public void disable(@PathVariable UUID uuid) {
+    public void disable(@PathVariable("uuid") UUID uuid) {
         disableUserUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/lock")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
-    public void lock(@PathVariable UUID uuid) {
+    public void lock(@PathVariable("uuid") UUID uuid) {
         lockUserUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/unlock")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
-    public void unlock(@PathVariable UUID uuid) {
+    public void unlock(@PathVariable("uuid") UUID uuid) {
         unlockUserUseCase.execute(uuid);
     }
 
     @PutMapping("/{uuid}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
-    public void resetPassword(@PathVariable UUID uuid,
+    public void resetPassword(@PathVariable("uuid") UUID uuid,
                               @Valid @RequestBody ResetPasswordRequest request) {
         resetUserPasswordUseCase.execute(new ResetUserPasswordCommand(uuid, request.newPassword()));
     }
 
     @GetMapping("/{uuid}/authorities")
     @PreAuthorize("hasAuthority('user:read')")
-    public UserAuthoritiesResponse getAuthorities(@PathVariable UUID uuid) {
+    public UserAuthoritiesResponse getAuthorities(@PathVariable("uuid") UUID uuid) {
         UserAuthoritiesResult result = getUserAuthoritiesUseCase.execute(uuid);
         return userWebMapper.toResponse(result);
     }
@@ -142,7 +142,7 @@ public class UserController {
     @PostMapping("/{uuid}/roles")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('user:assign')")
-    public List<RoleAssignmentResult> assignRoles(@PathVariable UUID uuid,
+    public List<RoleAssignmentResult> assignRoles(@PathVariable("uuid") UUID uuid,
                                                   @Valid @RequestBody AssignRolesToUserRequest request) {
         AssignRolesToUserCommand command = userWebMapper.toCommand(uuid, request);
         return assignRolesToUserUseCase.execute(command);
@@ -151,15 +151,15 @@ public class UserController {
     @DeleteMapping("/{uuid}/roles/{roleUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:assign')")
-    public void revokeRole(@PathVariable UUID uuid, @PathVariable UUID roleUuid,
-                           @RequestParam(defaultValue = "REVOKED") String reason) {
+    public void revokeRole(@PathVariable("uuid") UUID uuid, @PathVariable("roleUuid") UUID roleUuid,
+                           @RequestParam(name = "reason", defaultValue = "REVOKED") String reason) {
         revokeRoleFromUserUseCase.execute(uuid, roleUuid, reason);
     }
 
     @PostMapping("/{uuid}/permissions")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('user:assign')")
-    public List<PermissionGrantResult> grantPermissions(@PathVariable UUID uuid,
+    public List<PermissionGrantResult> grantPermissions(@PathVariable("uuid") UUID uuid,
                                                         @Valid @RequestBody GrantPermissionsToUserRequest request) {
         GrantPermissionsToUserCommand command = userWebMapper.toCommand(uuid, request);
         return grantPermissionsToUserUseCase.execute(command);
@@ -168,14 +168,14 @@ public class UserController {
     @DeleteMapping("/{uuid}/permissions/{permissionUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:assign')")
-    public void revokePermission(@PathVariable UUID uuid, @PathVariable UUID permissionUuid,
-                                 @RequestParam(defaultValue = "REVOKED") String reason) {
+    public void revokePermission(@PathVariable("uuid") UUID uuid, @PathVariable("permissionUuid") UUID permissionUuid,
+                                 @RequestParam(name = "reason", defaultValue = "REVOKED") String reason) {
         revokePermissionFromUserUseCase.execute(uuid, permissionUuid, reason);
     }
 
     @GetMapping("/{uuid}/identities")
     @PreAuthorize("hasAuthority('user:read')")
-    public List<IdentityResponse> listIdentities(@PathVariable UUID uuid) {
+    public List<IdentityResponse> listIdentities(@PathVariable("uuid") UUID uuid) {
         return listUserIdentitiesUseCase.execute(uuid).stream()
                 .map(userWebMapper::toResponse)
                 .toList();
@@ -184,8 +184,8 @@ public class UserController {
     @DeleteMapping("/{uuid}/identities/{identityUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('user:update')")
-    public void unlinkIdentity(@PathVariable UUID uuid,
-                               @PathVariable UUID identityUuid) {
+    public void unlinkIdentity(@PathVariable("uuid") UUID uuid,
+                               @PathVariable("identityUuid") UUID identityUuid) {
         unlinkIdentityUseCase.execute(uuid, identityUuid);
     }
 }

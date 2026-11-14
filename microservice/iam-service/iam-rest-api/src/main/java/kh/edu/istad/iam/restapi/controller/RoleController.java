@@ -53,11 +53,11 @@ public class RoleController {
     @GetMapping
     @PreAuthorize("hasAuthority('role:read')")
     public PageResponse<RoleSummary> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt,desc") String sort,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Boolean enabled
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "createdAt,desc") String sort,
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "enabled", required = false) Boolean enabled
     ) {
         RoleFilterQuery query = new RoleFilterQuery(page, size, sort, search, enabled);
         PageResult<RoleSummary> pageResult = listRoleUseCase.execute(query);
@@ -74,14 +74,14 @@ public class RoleController {
 
     @GetMapping("/{uuid}")
     @PreAuthorize("hasAuthority('role:read')")
-    public RoleResponse getByUuid(@PathVariable UUID uuid) {
+    public RoleResponse getByUuid(@PathVariable("uuid") UUID uuid) {
         RoleResult result = getRoleUseCase.execute(uuid);
         return roleWebMapper.toResponse(result);
     }
 
     @PatchMapping("/{uuid}")
     @PreAuthorize("hasAuthority('role:update')")
-    public RoleResponse update(@PathVariable UUID uuid,
+    public RoleResponse update(@PathVariable("uuid") UUID uuid,
                                @Valid @RequestBody UpdateRoleRequest request) {
         UpdateRoleCommand command = roleWebMapper.toCommand(uuid, request);
         RoleResult result = updateRoleUseCase.execute(command);
@@ -91,28 +91,28 @@ public class RoleController {
     @DeleteMapping("/{uuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('role:delete')")
-    public void delete(@PathVariable UUID uuid) {
+    public void delete(@PathVariable("uuid") UUID uuid) {
         deleteRoleUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('role:update')")
-    public void activate(@PathVariable UUID uuid) {
+    public void activate(@PathVariable("uuid") UUID uuid) {
         activateRoleUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('role:update')")
-    public void deactivate(@PathVariable UUID uuid) {
+    public void deactivate(@PathVariable("uuid") UUID uuid) {
         deactivateRoleUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/permissions")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('role:assign')")
-    public List<PermissionAssignmentResult> assignPermissions(@PathVariable UUID uuid,
+    public List<PermissionAssignmentResult> assignPermissions(@PathVariable("uuid") UUID uuid,
                                                               @Valid @RequestBody AssignPermissionsToRoleRequest request) {
         AssignPermissionsToRoleCommand command = roleWebMapper.toCommand(uuid, request);
         return assignPermissionsToRoleUseCase.execute(command);
@@ -121,8 +121,8 @@ public class RoleController {
     @DeleteMapping("/{uuid}/permissions/{permissionUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('role:assign')")
-    public void revokePermission(@PathVariable UUID uuid, @PathVariable UUID permissionUuid,
-                                 @RequestParam(defaultValue = "REVOKED") String reason) {
+    public void revokePermission(@PathVariable("uuid") UUID uuid, @PathVariable("permissionUuid") UUID permissionUuid,
+                                 @RequestParam(name = "reason", defaultValue = "REVOKED") String reason) {
         revokePermissionFromRoleUseCase.execute(uuid, permissionUuid, reason);
     }
 }

@@ -33,7 +33,7 @@ public class PermissionRepositoryAdapter implements PermissionRepository {
     @Override
     public Optional<Permission> findById(Long id) {
         return permissionJpaRepository.findById(id)
-                .filter(permissionEntity -> permissionEntity.isDeleted())
+                .filter(permissionEntity -> !permissionEntity.isDeleted())
                 .map(permissionPersistenMapper::entityToDomain);
     }
 

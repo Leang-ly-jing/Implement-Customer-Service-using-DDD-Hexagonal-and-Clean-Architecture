@@ -3,6 +3,7 @@ package kh.edu.istad.iam.domain.entity;
 import kh.edu.istad.iam.domain.exception.AuthorizationDomainException;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Permission extends BaseAuditEntity<Long> {
@@ -24,6 +25,7 @@ public class Permission extends BaseAuditEntity<Long> {
                       Long version, Instant createdAt, String createdBy, Instant updatedAt,
                       String updatedBy, Instant deletedAt, String deletedBy) {
         super(createdAt, createdBy, updatedAt, updatedBy, deletedAt, deletedBy);
+        super.setId(id);
         this.id = id;
         this.uuid = uuid;
         this.name = name;
@@ -55,7 +57,24 @@ public class Permission extends BaseAuditEntity<Long> {
 
     @Override
     public void setId(Long id) {
+        super.setId(id);
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Permission that = (Permission) o;
+        if (uuid != null && that.uuid != null) {
+            return uuid.equals(that.uuid);
+        }
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : Objects.hashCode(id);
     }
 
     public UUID getUuid() {

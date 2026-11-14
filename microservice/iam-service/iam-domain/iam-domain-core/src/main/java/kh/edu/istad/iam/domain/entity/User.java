@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -61,6 +62,7 @@ public class User extends BaseAuditEntity<Long> {
                 Instant createdAt, String createdBy, Instant updatedAt, String updatedBy,
                 Long version, Set<Permission> permissions, Set<Role> roles) {
         super(createdAt, createdBy, updatedAt, updatedBy, deletedAt, deletedBy);
+        super.setId(id);
         this.id = id;
         this.uuid = uuid;
         this.username = username;
@@ -175,7 +177,24 @@ public class User extends BaseAuditEntity<Long> {
 
     @Override
     public void setId(Long id) {
+        super.setId(id);
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        if (uuid != null && user.uuid != null) {
+            return uuid.equals(user.uuid);
+        }
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : Objects.hashCode(id);
     }
 
     public UUID getUuid() {

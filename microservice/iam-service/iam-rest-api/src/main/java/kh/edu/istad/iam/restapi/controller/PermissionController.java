@@ -46,11 +46,11 @@ public class PermissionController {
     @GetMapping
     @PreAuthorize("hasAuthority('permission:read')")
     public PageResponse<PermissionResult> list(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name,asc") String sort,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Boolean enabled
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "name,asc") String sort,
+            @RequestParam(name = "search", required = false) String search,
+            @RequestParam(name = "enabled", required = false) Boolean enabled
     ) {
         PermissionFilterQuery query = new PermissionFilterQuery(page, size, sort, search, enabled);
         PageResult<PermissionResult> pageResult = listPermissionUseCase.execute(query);
@@ -67,14 +67,14 @@ public class PermissionController {
 
     @GetMapping("/{uuid}")
     @PreAuthorize("hasAuthority('permission:read')")
-    public PermissionResponse getByUuid(@PathVariable UUID uuid) {
+    public PermissionResponse getByUuid(@PathVariable("uuid") UUID uuid) {
         PermissionResult result = getPermissionUseCase.execute(uuid);
         return permissionWebMapper.toResponse(result);
     }
 
     @PatchMapping("/{uuid}")
     @PreAuthorize("hasAuthority('permission:update')")
-    public PermissionResponse update(@PathVariable UUID uuid,
+    public PermissionResponse update(@PathVariable("uuid") UUID uuid,
                                      @Valid @RequestBody UpdatePermissionRequest request) {
         UpdatePermissionCommand command = permissionWebMapper.toCommand(uuid, request);
         PermissionResult result = updatePermissionUseCase.execute(command);
@@ -84,21 +84,21 @@ public class PermissionController {
     @DeleteMapping("/{uuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('permission:delete')")
-    public void delete(@PathVariable UUID uuid) {
+    public void delete(@PathVariable("uuid") UUID uuid) {
         deletePermissionUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('permission:update')")
-    public void activate(@PathVariable UUID uuid) {
+    public void activate(@PathVariable("uuid") UUID uuid) {
         activatePermissionUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('permission:update')")
-    public void deactivate(@PathVariable UUID uuid) {
+    public void deactivate(@PathVariable("uuid") UUID uuid) {
         deactivatePermissionUseCase.execute(uuid);
     }
 }

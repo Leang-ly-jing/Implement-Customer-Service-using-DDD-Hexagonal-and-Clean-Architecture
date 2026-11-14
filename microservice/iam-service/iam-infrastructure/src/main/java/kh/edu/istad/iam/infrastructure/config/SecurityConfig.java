@@ -9,6 +9,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -24,6 +25,7 @@ import org.springframework.security.config.annotation.web.configuration.OAuth2Au
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.authorization.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.authentication.OidcIdTokenDecoderFactory;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -71,6 +73,7 @@ public class SecurityConfig {
     private final JdbcTemplate jdbcTemplate;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOidcUserService customOidcUserService;
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     @Order(1)
@@ -174,18 +177,22 @@ public class SecurityConfig {
     public RegisteredClientRepository registeredClientRepository() {
         JdbcRegisteredClientRepository repository = new JdbcRegisteredClientRepository(jdbcTemplate);
 
-        if (repository.findByClientId("registrar-client") == null) {
-            RegisteredClient registrarClient = RegisteredClient.withId(UUID.randomUUID().toString())
-                    .clientId("registrar-client")
-                    .clientSecret("{noop}secret")
-                    .clientName("Registrar Client")
-                    .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                    .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                    .scope("client.create")
-                    .scope("client.read")
-                    .build();
-            repository.save(registrarClient);
+        RegisteredClient existingRegistrar = repository.findByClientId("registrar-client");
+        if (existingRegistrar != null) {
+            jdbcTemplate.update("DELETE FROM oauth2_registered_client WHERE client_id = ?", "registrar-client");
         }
+
+        RegisteredClient registrarClient = RegisteredClient.withId("d290f1ee-6c54-4b01-90e6-d701748f0851")
+                .clientId("registrar-client")
+                .clientSecret(passwordEncoder.encode("secret"))
+                .clientName("Registrar Client")
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
+                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                .scope("client.create")
+                .scope("client.read")
+                .build();
+        repository.save(registrarClient);
 
         RegisteredClient existingOidc = repository.findByClientId("oidc-client");
         if (existingOidc != null) {
@@ -203,12 +210,12 @@ public class SecurityConfig {
 
         ClientSettings clientSettings = ClientSettings.builder()
                 .requireProofKey(false)
-                .requireAuthorizationConsent(true)
+                .requireAuthorizationConsent(false)
                 .build();
 
-        RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
+        RegisteredClient oidcClient = RegisteredClient.withId("c40e53a8-6e54-4a27-a02e-8c310c85c391")
                 .clientId("oidc-client")
-                .clientSecret("{noop}oidc-secret")
+                .clientSecret(passwordEncoder.encode("oidc-secret"))
                 .clientName("OIDC Client")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
@@ -216,6 +223,9 @@ public class SecurityConfig {
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
                 .redirectUri("http://127.0.0.1:8080/login/oauth2/code/oidc-client")
+                .redirectUri("http://localhost:8080/login/oauth2/code/oidc-client")
+                .redirectUri("https://oauth.pstmn.io/v1/callback")
+                .redirectUri("https://oauth.pstmn.io/v1/browser-callback")
                 .postLogoutRedirectUri("http://127.0.0.1:8080/")
                 .scope(OidcScopes.OPENID)
                 .scope(OidcScopes.PROFILE)
@@ -286,6 +296,25 @@ public class SecurityConfig {
         return AuthorizationServerSettings.builder()
                 .issuer("http://localhost:9000")
                 .build();
+    }
+
+    @Bean
+    public ApplicationRunner initAdminPermissionsRunner() {
+        return args -> {
+            try {
+                jdbcTemplate.update(
+                        "INSERT INTO role_permissions (role_id, permission_id, assigned_at, assigned_by, reason) " +
+                        "SELECT r.id, p.id, CURRENT_TIMESTAMP, 'SYSTEM', 'Seed admin permissions' " +
+                        "FROM roles r CROSS JOIN permissions p " +
+                        "WHERE r.name = 'ADMIN' " +
+                        "AND NOT EXISTS ( " +
+                        "    SELECT 1 FROM role_permissions rp " +
+                        "    WHERE rp.role_id = r.id AND rp.permission_id = p.id AND rp.revoked_at IS NULL " +
+                        ")"
+                );
+            } catch (Exception ignored) {
+            }
+        };
     }
 
     private static class TolerantClientBasicAuthenticationConverter implements AuthenticationConverter {

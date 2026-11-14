@@ -3,6 +3,7 @@ package kh.edu.istad.iam.domain.entity;
 import kh.edu.istad.iam.domain.exception.AuthorizationDomainException;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ public class Role extends BaseAuditEntity<Long> {
                 Instant createdAt, String createdBy, Instant updatedAt, String updatedBy,
                 Instant deletedAt, String deletedBy) {
         super(createdAt, createdBy, updatedAt, updatedBy, deletedAt, deletedBy);
+        super.setId(id);
         this.id = id;
         this.uuid = uuid;
         this.name = name;
@@ -58,7 +60,24 @@ public class Role extends BaseAuditEntity<Long> {
 
     @Override
     public void setId(Long id) {
+        super.setId(id);
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Role role = (Role) o;
+        if (uuid != null && role.uuid != null) {
+            return uuid.equals(role.uuid);
+        }
+        return Objects.equals(id, role.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : Objects.hashCode(id);
     }
 
     public UUID getUuid() {

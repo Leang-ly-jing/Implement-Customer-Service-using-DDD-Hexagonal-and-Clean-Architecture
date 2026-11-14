@@ -76,7 +76,7 @@ public class MeController {
 
     @DeleteMapping("/identities/{identityUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void unlinkIdentity(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID identityUuid) {
+    public void unlinkIdentity(@AuthenticationPrincipal Jwt jwt, @PathVariable("identityUuid") UUID identityUuid) {
         UUID userUuid = UUID.fromString(jwt.getSubject());
         unlinkIdentityUseCase.execute(userUuid, identityUuid);
     }
