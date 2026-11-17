@@ -52,6 +52,8 @@ public interface UserRepository {
 
     Optional<Identity> findIdentityByProviderAndSubject(IdentityProvider provider, String providerSubject);
 
+    Optional<Identity> findAnyIdentityByProviderAndSubject(IdentityProvider provider, String providerSubject);
+
     List<Identity> findIdentitiesByUserId(Long userId);
 
     Optional<Identity> findIdentityByUserIdAndProvider(Long userId, IdentityProvider provider);

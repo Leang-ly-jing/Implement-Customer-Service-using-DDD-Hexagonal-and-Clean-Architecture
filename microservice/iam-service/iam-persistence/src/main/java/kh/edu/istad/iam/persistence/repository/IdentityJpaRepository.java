@@ -12,6 +12,7 @@ public interface IdentityJpaRepository extends JpaRepository<IdentityEntity, Lon
     Optional<IdentityEntity> findByUuidAndIsDeletedFalse(UUID uuid);
 
     Optional<IdentityEntity> findByProviderAndProviderSubjectAndIsDeletedFalse(String provider, String providerSubject);
+    Optional<IdentityEntity> findByProviderAndProviderSubject(String provider, String providerSubject);
     List<IdentityEntity> findByUserIdAndIsDeletedFalse(Long userId);
     Optional<IdentityEntity> findByUserIdAndProviderAndIsDeletedFalse(Long userId, String provider);
 }

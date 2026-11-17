@@ -159,7 +159,12 @@ export function ClientCreateModal({
                       checked={checked}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setForm({ ...form, clientAuthenticationMethods: [...form.clientAuthenticationMethods, m.id] })
+                          const updated = [...form.clientAuthenticationMethods, m.id]
+                          setForm({
+                            ...form,
+                            clientAuthenticationMethods: updated,
+                            requireProofKey: m.id === "none" ? true : form.requireProofKey,
+                          })
                         } else {
                           setForm({ ...form, clientAuthenticationMethods: form.clientAuthenticationMethods.filter((x) => x !== m.id) })
                         }
@@ -278,9 +283,15 @@ export function ClientCreateModal({
               />
               <div>
                 <span className="font-medium block">{lang === "km" ? "តម្រូវឱ្យប្រើ PKCE" : "Require PKCE (Proof Key)"}</span>
-                <span className="text-[11px] text-muted-foreground block">
-                  {lang === "km" ? "ណែនាំសម្រាប់ SPA និង Mobile App" : "Recommended for SPAs and mobile apps"}
-                </span>
+                {form.clientAuthenticationMethods.includes("none") ? (
+                  <span className="text-[11px] text-amber-600 font-medium block">
+                    {lang === "km" ? "តម្រូវជាចាំបាច់សម្រាប់ Public Client (none)" : "Mandatory for Public Client (none)"}
+                  </span>
+                ) : (
+                  <span className="text-[11px] text-muted-foreground block">
+                    {lang === "km" ? "ណែនាំសម្រាប់ SPA និង Mobile App" : "Recommended for SPAs and mobile apps"}
+                  </span>
+                )}
               </div>
             </label>
 

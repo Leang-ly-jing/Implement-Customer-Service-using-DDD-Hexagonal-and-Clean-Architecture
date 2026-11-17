@@ -47,10 +47,23 @@ export default function RegisterPage() {
 
     try {
       await authService.register(formData)
-      toast.success(isKm ? "ជោគជ័យ" : "Success", t("auth.registerSuccess"))
-      navigate("/login", { replace: true })
+      const successTitle = isKh ? "ការចុះឈ្មោះបានជោគជ័យ" : "Registration Successful"
+      const successMessage = t("auth.registerSuccess")
+      toast.success(successTitle, successMessage)
+      navigate("/login", {
+        replace: true,
+        state: {
+          registered: true,
+          username: formData.userName,
+          message: successMessage,
+        },
+      })
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.detail || (isKm ? "ការចុះឈ្មោះបានបរាជ័យ" : "Registration failed."))
+      setError(
+        err.response?.data?.message ||
+        err.response?.data?.detail ||
+        (isKh ? "ការចុះឈ្មោះបានបរាជ័យ" : "Registration failed.")
+      )
     } finally {
       setLoading(false)
     }

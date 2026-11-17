@@ -10,6 +10,7 @@ import {
   Check,
   CheckCheck,
 } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -32,8 +33,8 @@ export function RolePermissionsModal({
   onAssignPermissions,
   onRevokePermission,
   assignSubmitting = false,
-  lang = "km",
 }) {
+  const { t } = useTranslation()
   const [tab, setTab] = useState("assigned")
   const [assignedSearch, setAssignedSearch] = useState("")
   const [search, setSearch] = useState("")
@@ -135,15 +136,10 @@ export function RolePermissionsModal({
             </div>
             <div>
               <DialogTitle className="text-base font-semibold">
-                {lang === "km"
-                  ? `គ្រប់គ្រង Permissions: ${role.name}`
-                  : `Manage Permissions: ${role.name}`}
+                {t("rolePermissionsModal.title", { roleName: role.name })}
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground">
-                {role.description ||
-                  (lang === "km"
-                    ? "ផ្ដល់ ឬដកសិទ្ធិអនុញ្ញាតសម្រាប់ Role នេះ"
-                    : "Assign or revoke permission scopes for this role.")}
+                {role.description || t("rolePermissionsModal.description")}
               </DialogDescription>
             </div>
           </div>
@@ -161,7 +157,7 @@ export function RolePermissionsModal({
             }`}
           >
             <ShieldCheck className="size-4 text-emerald-600" />
-            <span>{lang === "km" ? "Permissions ដែលមាន" : "Assigned Permissions"}</span>
+            <span>{t("rolePermissionsModal.assignedTab")}</span>
             <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-mono font-bold">
               {uniqueAssigned.length}
             </span>
@@ -176,7 +172,7 @@ export function RolePermissionsModal({
             }`}
           >
             <Plus className="size-4 text-primary" />
-            <span>{lang === "km" ? "បន្ថែម Permission ថ្មី" : "Assign More Permissions"}</span>
+            <span>{t("rolePermissionsModal.addTab")}</span>
             {unassigned.length > 0 && (
               <span className="ml-1 rounded-full bg-primary/15 text-primary px-2 py-0.5 text-[10px] font-mono font-bold">
                 +{unassigned.length}
@@ -191,7 +187,7 @@ export function RolePermissionsModal({
             <div className="py-16 text-center text-muted-foreground">
               <RefreshCw className="size-7 animate-spin mx-auto mb-2 opacity-60" />
               <p className="text-xs font-medium">
-                {lang === "km" ? "កំពុងទាញយក Permissions..." : "Loading permissions..."}
+                {t("rolePermissionsModal.loading")}
               </p>
             </div>
           ) : tab === "assigned" ? (
@@ -203,11 +199,7 @@ export function RolePermissionsModal({
                   <Input
                     value={assignedSearch}
                     onChange={(e) => setAssignedSearch(e.target.value)}
-                    placeholder={
-                      lang === "km"
-                        ? "ស្វែងរក permission ក្នុង role នេះ..."
-                        : "Filter assigned permissions by name, resource, action..."
-                    }
+                    placeholder={t("rolePermissionsModal.filterPlaceholder")}
                     className="pl-8 pr-8 h-8.5 text-xs"
                   />
                   {assignedSearch && (
@@ -226,14 +218,10 @@ export function RolePermissionsModal({
                 <div className="py-16 text-center text-muted-foreground border rounded-xl bg-muted/10">
                   <Key className="size-9 mx-auto mb-2.5 opacity-30 text-primary" />
                   <p className="text-sm font-medium text-foreground">
-                    {lang === "km"
-                      ? "Role នេះមិនទាន់មាន Permission ណាមួយនៅឡើយទេ"
-                      : "No permissions assigned to this role yet."}
+                    {t("rolePermissionsModal.noAssignedTitle")}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
-                    {lang === "km"
-                      ? "ចុចប៊ូតុងខាងក្រោមដើម្បីផ្ដល់សិទ្ធិថ្មីដល់ Role នេះ"
-                      : "Click below to assign new access permissions to this role."}
+                    {t("rolePermissionsModal.noAssignedDesc")}
                   </p>
                   <Button
                     variant="outline"
@@ -242,16 +230,14 @@ export function RolePermissionsModal({
                     className="mt-4 gap-1.5 text-xs"
                   >
                     <Plus className="size-3.5" />
-                    <span>{lang === "km" ? "ផ្ដល់ Permission ឥឡូវនេះ" : "Assign Permissions Now"}</span>
+                    <span>{t("rolePermissionsModal.assignNow")}</span>
                   </Button>
                 </div>
               ) : filteredAssigned.length === 0 ? (
                 <div className="py-12 text-center text-muted-foreground border rounded-xl">
                   <Search className="size-7 mx-auto mb-2 opacity-30" />
                   <p className="text-xs">
-                    {lang === "km"
-                      ? "រកមិនឃើញ Permission ដែលត្រូវនឹងការស្វែងរកទេ"
-                      : "No matching permissions found."}
+                    {t("rolePermissionsModal.noMatching")}
                   </p>
                 </div>
               ) : (
@@ -293,10 +279,10 @@ export function RolePermissionsModal({
                         size="sm"
                         onClick={() => onRevokePermission(p.uuid)}
                         className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200/60 h-8 px-2.5 text-xs font-medium gap-1.5 transition-colors shrink-0"
-                        title={lang === "km" ? "ដកសិទ្ធិនេះចេញ" : "Revoke this permission"}
+                        title={t("rolePermissionsModal.revokeTitle")}
                       >
                         <Trash2 className="size-3.5" />
-                        <span>{lang === "km" ? "ដកចេញ" : "Revoke"}</span>
+                        <span>{t("rolePermissionsModal.revoke")}</span>
                       </Button>
                     </div>
                   ))}
@@ -311,11 +297,7 @@ export function RolePermissionsModal({
                   <Input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder={
-                      lang === "km"
-                        ? "ស្វែងរក permission តាមឈ្មោះ, resource..."
-                        : "Search available permissions..."
-                    }
+                    placeholder={t("rolePermissionsModal.searchPlaceholder")}
                     className="pl-8 pr-8 h-8.5 text-xs"
                   />
                   {search && (
@@ -339,7 +321,7 @@ export function RolePermissionsModal({
                       className="h-8.5 text-xs text-muted-foreground hover:text-foreground gap-1 px-2"
                     >
                       <CheckCheck className="size-3.5" />
-                      <span>{lang === "km" ? "ជ្រើសទាំងអស់" : "Select All"}</span>
+                      <span>{t("rolePermissionsModal.selectAll")}</span>
                     </Button>
                     {selectedToAdd.length > 0 && (
                       <Button
@@ -349,7 +331,7 @@ export function RolePermissionsModal({
                         onClick={handleClearSelection}
                         className="h-8.5 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-2"
                       >
-                        {lang === "km" ? "សម្អាត" : "Clear"}
+                        {t("rolePermissionsModal.clear")}
                       </Button>
                     )}
                   </div>
@@ -361,9 +343,7 @@ export function RolePermissionsModal({
                   <div className="p-8 text-center text-muted-foreground">
                     <Key className="size-7 mx-auto mb-2 opacity-30 text-primary" />
                     <p className="text-xs font-medium">
-                      {lang === "km"
-                        ? "គ្មាន Permission ណាដែលទំនេរសម្រាប់ផ្ដល់ទៀតទេ"
-                        : "No unassigned permissions available."}
+                      {t("rolePermissionsModal.noUnassigned")}
                     </p>
                   </div>
                 ) : (
@@ -424,7 +404,7 @@ export function RolePermissionsModal({
               {/* Assignment Action Bar */}
               <div className="flex items-center justify-between pt-1">
                 <span className="text-xs text-muted-foreground font-medium">
-                  {selectedToAdd.length} {lang === "km" ? "បានជ្រើសរើស" : "selected"}
+                  {selectedToAdd.length} {t("rolePermissionsModal.selected")}
                 </span>
                 <Button
                   size="sm"
@@ -438,9 +418,7 @@ export function RolePermissionsModal({
                     <Check className="size-3.5" />
                   )}
                   <span>
-                    {lang === "km"
-                      ? `ផ្ដល់ ${selectedToAdd.length} Permissions`
-                      : `Assign ${selectedToAdd.length} Permissions`}
+                    {t("rolePermissionsModal.assignButton", { count: selectedToAdd.length })}
                   </span>
                 </Button>
               </div>
@@ -450,7 +428,7 @@ export function RolePermissionsModal({
 
         <DialogFooter className="border-t pt-3 flex items-center justify-end">
           <Button variant="outline" size="sm" onClick={onClose} className="text-xs">
-            {lang === "km" ? "បិទ" : "Close"}
+            {t("common.close")}
           </Button>
         </DialogFooter>
       </DialogContent>

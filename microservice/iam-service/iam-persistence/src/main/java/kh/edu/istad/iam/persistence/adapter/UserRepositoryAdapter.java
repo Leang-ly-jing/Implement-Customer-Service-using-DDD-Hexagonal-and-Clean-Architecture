@@ -139,6 +139,28 @@ public class UserRepositoryAdapter implements UserRepository {
     @Override
     public Identity saveIdentity(Identity identity) {
         IdentityEntity identityEntity = userPersistenceMapper.identityToEntity(identity);
+        if (identityEntity.getId() == null) {
+            Optional<IdentityEntity> existing = identityJpaRepository
+                    .findByProviderAndProviderSubject(identityEntity.getProvider(), identityEntity.getProviderSubject());
+            if (existing.isPresent()) {
+                IdentityEntity current = existing.get();
+                current.setUserId(identityEntity.getUserId());
+                current.setEmail(identityEntity.getEmail());
+                current.setEmailVerified(identityEntity.isEmailVerified());
+                current.setDisplayName(identityEntity.getDisplayName());
+                current.setUsername(identityEntity.getUsername());
+                current.setPictureUrl(identityEntity.getPictureUrl());
+                current.setAttributes(identityEntity.getAttributes());
+                current.setLastLoginAt(identityEntity.getLastLoginAt());
+                current.setDeleted(false);
+                current.setDeletedAt(null);
+                current.setDeletedBy(null);
+                current.setUpdatedAt(identityEntity.getUpdatedAt() != null ? identityEntity.getUpdatedAt() : java.time.Instant.now());
+                current.setUpdatedBy(identityEntity.getUpdatedBy() != null ? identityEntity.getUpdatedBy() : "FEDERATION");
+                IdentityEntity saved = identityJpaRepository.save(current);
+                return userPersistenceMapper.entityToIdentity(saved);
+            }
+        }
         IdentityEntity savedIdentityEntity = identityJpaRepository.save(identityEntity);
         return userPersistenceMapper.entityToIdentity(savedIdentityEntity);
     }
@@ -153,7 +175,12 @@ public class UserRepositoryAdapter implements UserRepository {
     public Optional<Identity> findIdentityByProviderAndSubject(IdentityProvider provider, String providerSubject) {
         return identityJpaRepository.findByProviderAndProviderSubjectAndIsDeletedFalse(provider.name(), providerSubject)
                 .map(userPersistenceMapper::entityToIdentity);
+    }
 
+    @Override
+    public Optional<Identity> findAnyIdentityByProviderAndSubject(IdentityProvider provider, String providerSubject) {
+        return identityJpaRepository.findByProviderAndProviderSubject(provider.name(), providerSubject)
+                .map(userPersistenceMapper::entityToIdentity);
     }
 
     @Override

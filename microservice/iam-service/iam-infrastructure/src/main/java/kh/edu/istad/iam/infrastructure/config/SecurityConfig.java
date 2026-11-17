@@ -226,7 +226,7 @@ public class SecurityConfig {
                         .build();
 
         ClientSettings clientSettings = ClientSettings.builder()
-                .requireProofKey(false)
+                .requireProofKey(true)
                 .requireAuthorizationConsent(false)
                 .build();
 

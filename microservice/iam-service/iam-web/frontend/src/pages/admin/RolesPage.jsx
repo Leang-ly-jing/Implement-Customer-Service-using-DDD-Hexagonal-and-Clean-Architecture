@@ -12,6 +12,7 @@ import { RoleDeleteDialog } from "./role/RoleDeleteDialog"
 import { RolePermissionsModal } from "./role/RolePermissionsModal"
 
 export default function RolesPage() {
+  const { t } = useTranslation()
   const [roles, setRoles] = useState([])
   const [pageMeta, setPageMeta] = useState({ number: 0, size: 10, totalElements: 0, totalPages: 0 })
   const [loading, setLoading] = useState(true)
@@ -33,11 +34,6 @@ export default function RolesPage() {
   const [permLoading, setPermLoading] = useState(false)
   const [assignSubmitting, setAssignSubmitting] = useState(false)
 
-  const { i18n } = useTranslation()
-  const rawLang = i18n?.language || localStorage.getItem("lang") || "kh"
-  const isKhmer = rawLang.startsWith("kh") || rawLang.startsWith("km")
-  const lang = isKhmer ? "km" : "en"
-
   const fetchRoles = async (page = 0) => {
     setLoading(true)
     try {
@@ -49,8 +45,8 @@ export default function RolesPage() {
     } catch (err) {
       console.error("Failed to fetch roles:", err)
       toast.error(
-        lang === "km" ? "បរាជ័យ" : "Error",
-        err.response?.data?.detail || "Could not retrieve roles list."
+        t("common.error"),
+        err.response?.data?.detail || t("rolesPage.fetchFailed")
       )
     } finally {
       setLoading(false)
@@ -74,8 +70,8 @@ export default function RolesPage() {
   const handleCreateSubmit = async (form) => {
     if (!form.name.trim()) {
       toast.error(
-        lang === "km" ? "កំហុស" : "Validation",
-        lang === "km" ? "សូមបញ្ចូលឈ្មោះ Role" : "Role name is required."
+        t("common.error"),
+        t("rolesPage.roleName") + " is required."
       )
       return
     }
@@ -87,16 +83,16 @@ export default function RolesPage() {
         permissionUuids: form.permissionUuids,
       })
       toast.success(
-        lang === "km" ? "ជោគជ័យ" : "Created",
-        lang === "km" ? "បានបង្កើត Role ថ្មីដោយជោគជ័យ" : "Role created successfully."
+        t("common.success"),
+        t("rolesPage.createSuccess")
       )
       setCreateOpen(false)
       fetchRoles(0)
     } catch (err) {
       console.error("Create role error:", err)
       toast.error(
-        lang === "km" ? "បរាជ័យ" : "Error",
-        err.response?.data?.detail || "Failed to create role."
+        t("common.error"),
+        err.response?.data?.detail || t("rolesPage.statusChangeFailed")
       )
     } finally {
       setCreateSubmitting(false)
@@ -112,16 +108,16 @@ export default function RolesPage() {
         description: form.description.trim() || undefined,
       })
       toast.success(
-        lang === "km" ? "ជោគជ័យ" : "Updated",
-        lang === "km" ? "បានកែប្រែព័ត៌មាន Role រួចរាល់" : "Role updated successfully."
+        t("common.success"),
+        t("rolesPage.editSuccess")
       )
       setEditingRole(null)
       fetchRoles(currentPage)
     } catch (err) {
       console.error("Update role error:", err)
       toast.error(
-        lang === "km" ? "បរាជ័យ" : "Error",
-        err.response?.data?.detail || "Failed to update role."
+        t("common.error"),
+        err.response?.data?.detail || t("rolesPage.statusChangeFailed")
       )
     } finally {
       setEditSubmitting(false)
@@ -134,16 +130,16 @@ export default function RolesPage() {
     try {
       await axiosClient.delete(`/roles/${deletingRole.uuid}`)
       toast.success(
-        lang === "km" ? "ជោគជ័យ" : "Deleted",
-        lang === "km" ? "បានលុប Role ដោយជោគជ័យ" : "Role deleted successfully."
+        t("common.success"),
+        t("rolesPage.deleteSuccess")
       )
       setDeletingRole(null)
       fetchRoles(currentPage)
     } catch (err) {
       console.error("Delete role error:", err)
       toast.error(
-        lang === "km" ? "បរាជ័យ" : "Error",
-        err.response?.data?.detail || "Failed to delete role."
+        t("common.error"),
+        err.response?.data?.detail || t("rolesPage.systemRoleCannotDelete")
       )
     } finally {
       setDeleteSubmitting(false)
@@ -155,17 +151,15 @@ export default function RolesPage() {
       const endpoint = role.active ? `/roles/${role.uuid}/deactivate` : `/roles/${role.uuid}/activate`
       await axiosClient.post(endpoint)
       toast.success(
-        lang === "km" ? "ជោគជ័យ" : "Updated",
-        role.active
-          ? (lang === "km" ? "បានបិទដំណើរការ Role" : "Role deactivated.")
-          : (lang === "km" ? "បានបើកដំណើរការ Role" : "Role activated.")
+        t("common.success"),
+        role.active ? t("rolesPage.roleDeactivated") : t("rolesPage.roleActivated")
       )
       fetchRoles(currentPage)
     } catch (err) {
       console.error("Status toggle error:", err)
       toast.error(
-        lang === "km" ? "បរាជ័យ" : "Error",
-        err.response?.data?.detail || "Failed to change role status."
+        t("common.error"),
+        err.response?.data?.detail || t("rolesPage.statusChangeFailed")
       )
     }
   }
@@ -179,8 +173,8 @@ export default function RolesPage() {
     } catch (err) {
       console.error("Failed to load role permissions:", err)
       toast.error(
-        lang === "km" ? "បរាជ័យ" : "Error",
-        err.response?.data?.detail || "Could not load role details."
+        t("common.error"),
+        err.response?.data?.detail || t("rolePermissionsModal.loadFailed")
       )
     } finally {
       setPermLoading(false)
@@ -193,14 +187,14 @@ export default function RolesPage() {
       await axiosClient.delete(`/roles/${permRole.uuid}/permissions/${permissionUuid}?reason=REVOKED`)
       setRolePermissions((prev) => prev.filter((p) => p.uuid !== permissionUuid))
       toast.success(
-        lang === "km" ? "ជោគជ័យ" : "Revoked",
-        lang === "km" ? "បានដកសិទ្ធិចេញពី Role រួចរាល់" : "Permission revoked successfully."
+        t("common.success"),
+        t("rolePermissionsModal.revokeSuccess")
       )
     } catch (err) {
       console.error("Revoke permission error:", err)
       toast.error(
-        lang === "km" ? "បរាជ័យ" : "Error",
-        err.response?.data?.detail || "Failed to revoke permission."
+        t("common.error"),
+        err.response?.data?.detail || t("rolePermissionsModal.revokeFailed")
       )
     }
   }
@@ -214,16 +208,16 @@ export default function RolesPage() {
         reason: "ADMIN_ASSIGNMENT",
       })
       toast.success(
-        lang === "km" ? "ជោគជ័យ" : "Assigned",
-        lang === "km" ? "បានផ្ដល់សិទ្ធិបន្ថែមទៅ Role រួចរាល់" : "Permissions assigned successfully."
+        t("common.success"),
+        t("rolePermissionsModal.assignSuccess")
       )
       const res = await axiosClient.get(`/roles/${permRole.uuid}`)
       setRolePermissions(res.data?.permissions || [])
     } catch (err) {
       console.error("Assign permissions error:", err)
       toast.error(
-        lang === "km" ? "បរាជ័យ" : "Error",
-        err.response?.data?.detail || "Failed to assign permissions."
+        t("common.error"),
+        err.response?.data?.detail || t("rolePermissionsModal.assignFailed")
       )
     } finally {
       setAssignSubmitting(false)
@@ -232,20 +226,15 @@ export default function RolesPage() {
 
   return (
     <div className="space-y-6">
-
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <PageHeader
-          title={lang === "km" ? "ការគ្រប់គ្រង Roles" : "Role Management"}
-          description={
-            lang === "km"
-              ? "គ្រប់គ្រងតួនាទី (Roles) នៅក្នុងប្រព័ន្ធ បង្កើត កែប្រែ លុប និងកំណត់ Permissions សម្រាប់ Role នីមួយៗ"
-              : "Create, view, update, and delete roles, and assign or remove permission scopes."
-          }
+          title={t("rolesPage.title")}
+          description={t("rolesPage.subtitle")}
         />
         <div className="flex items-center gap-2">
           <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-1.5">
             <Plus className="size-4" />
-            <span>{lang === "km" ? "បង្កើត Role ថ្មី" : "Create Role"}</span>
+            <span>{t("rolesPage.addRole")}</span>
           </Button>
         </div>
       </div>
@@ -260,7 +249,6 @@ export default function RolesPage() {
         onOpenEdit={(r) => setEditingRole(r)}
         onToggleStatus={handleToggleStatus}
         onOpenDelete={(r) => setDeletingRole(r)}
-        lang={lang}
       />
 
       <RoleCreateModal
@@ -269,7 +257,6 @@ export default function RolesPage() {
         onSubmit={handleCreateSubmit}
         allPermissions={allPermissions}
         submitting={createSubmitting}
-        lang={lang}
       />
 
       <RoleEditModal
@@ -278,7 +265,6 @@ export default function RolesPage() {
         role={editingRole}
         onSubmit={handleEditSubmit}
         submitting={editSubmitting}
-        lang={lang}
       />
 
       <RoleDeleteDialog
@@ -287,7 +273,6 @@ export default function RolesPage() {
         role={deletingRole}
         onConfirm={handleDeleteConfirm}
         submitting={deleteSubmitting}
-        lang={lang}
       />
 
       <RolePermissionsModal
@@ -300,7 +285,6 @@ export default function RolesPage() {
         onAssignPermissions={handleAssignPermissions}
         onRevokePermission={handleRevokePermission}
         assignSubmitting={assignSubmitting}
-        lang={lang}
       />
     </div>
   )

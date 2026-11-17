@@ -75,8 +75,11 @@ public class ClientManagementService {
                 .reuseRefreshTokens(false)
                 .build();
 
+        boolean hasNoneAuth = request.clientAuthenticationMethods() != null &&
+                request.clientAuthenticationMethods().stream().anyMatch(m -> "none".equalsIgnoreCase(m.trim()));
+
         ClientSettings clientSettings = ClientSettings.builder()
-                .requireProofKey(Boolean.TRUE.equals(request.requireProofKey()))
+                .requireProofKey(Boolean.TRUE.equals(request.requireProofKey()) || hasNoneAuth)
                 .requireAuthorizationConsent(Boolean.TRUE.equals(request.requireAuthorizationConsent()))
                 .build();
 
@@ -240,8 +243,11 @@ public class ClientManagementService {
                 .reuseRefreshTokens(false)
                 .build();
 
+        boolean hasNoneAuth = request.clientAuthenticationMethods() != null &&
+                request.clientAuthenticationMethods().stream().anyMatch(m -> "none".equalsIgnoreCase(m.trim()));
+
         ClientSettings clientSettings = ClientSettings.builder()
-                .requireProofKey(Boolean.TRUE.equals(request.requireProofKey()))
+                .requireProofKey(Boolean.TRUE.equals(request.requireProofKey()) || hasNoneAuth)
                 .requireAuthorizationConsent(Boolean.TRUE.equals(request.requireAuthorizationConsent()))
                 .build();
 

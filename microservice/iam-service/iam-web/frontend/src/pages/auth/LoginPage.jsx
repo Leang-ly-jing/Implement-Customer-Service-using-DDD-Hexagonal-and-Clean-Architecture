@@ -8,13 +8,26 @@ export default function LoginPage() {
   const currentLang = (i18n.language || "kh").toLowerCase();
   const isKh = currentLang.startsWith("kh") || currentLang.startsWith("km");
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/account/profile";
+
+  const [username, setUsername] = useState(location.state?.username || "");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState(
+    location.state?.message || (location.state?.registered ? t("auth.registerSuccess") : "")
+  );
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (location.state?.username) {
+      setUsername(location.state.username);
+    }
+    if (location.state?.registered) {
+      setSuccessMessage(location.state.message || t("auth.registerSuccess"));
+    }
+  }, [location.state, t]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -44,6 +57,7 @@ export default function LoginPage() {
       await authService.login(username, password);
       navigate(from, { replace: true });
     } catch (err) {
+      setSuccessMessage("");
       setError(err.response?.data?.message || err.response?.data?.detail || t("auth.loginError"));
     } finally {
       setLoading(false);
@@ -96,6 +110,40 @@ export default function LoginPage() {
             </h1>
             <p className="text-xs sm:text-sm text-slate-500">{t("auth.signInSubtitle")}</p>
           </div>
+
+          {successMessage && (
+            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm animate-in fade-in duration-300">
+              <svg
+                className="w-5 h-5 flex-shrink-0 mt-0.5 text-emerald-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div className="flex-1">
+                <p className="font-semibold text-emerald-900">
+                  {isKh ? "ការចុះឈ្មោះបានជោគជ័យ!" : "Registration Successful!"}
+                </p>
+                <p className="text-emerald-700 text-xs sm:text-sm mt-0.5">{successMessage}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSuccessMessage("")}
+                className="text-emerald-500 hover:text-emerald-700 -mr-1 -mt-1 p-1 rounded-lg hover:bg-emerald-100/50 transition cursor-pointer"
+                aria-label="Close"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
 
           {error && (
             <div className="flex items-start gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">

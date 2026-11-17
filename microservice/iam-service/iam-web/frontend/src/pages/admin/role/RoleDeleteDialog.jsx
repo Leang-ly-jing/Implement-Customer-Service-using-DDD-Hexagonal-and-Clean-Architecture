@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,36 +17,33 @@ export function RoleDeleteDialog({
   role,
   onConfirm,
   submitting = false,
-  lang = "km",
 }) {
+  const { t } = useTranslation()
+
   if (!isOpen || !role) return null
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-lg">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2 text-rose-600">
             <AlertTriangle className="size-5" />
-            <span>{lang === "km" ? "លុប Role?" : "Delete Role?"}</span>
+            <span>{t("rolesPage.deleteConfirmTitle", "Delete Role?")}</span>
           </AlertDialogTitle>
           <AlertDialogDescription>
-            {lang === "km"
-              ? `តើអ្នកប្រាកដថាចង់លុប Role "${role.name}" មែនទេ? សកម្មភាពនេះមិនអាចត្រឡប់ថយក្រោយវិញបានទេ។`
-              : `Are you sure you want to permanently delete role "${role.name}"? Users with this role may lose their access permissions.`}
+            {t("rolesPage.deleteConfirmDesc", `Are you sure you want to permanently delete role "${role.name}"? Users with this role may lose their access permissions.`)}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={submitting}>
-            {lang === "km" ? "បោះបង់" : "Cancel"}
+            {t("common.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             disabled={submitting}
             className="bg-rose-600 hover:bg-rose-700 text-white"
           >
-            {submitting
-              ? lang === "km" ? "កំពុងលុប..." : "Deleting..."
-              : lang === "km" ? "លុបចេញ" : "Delete"}
+            {submitting ? t("common.deleting", "Deleting...") : t("common.delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
