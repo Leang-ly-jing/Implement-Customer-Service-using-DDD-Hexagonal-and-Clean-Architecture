@@ -18,7 +18,6 @@ public class ResetUserPasswordUseCase {
     private final PasswordHasher passwordHasher;
     private final CurrentActorProvider currentActorProvider;
 
-
     public void execute(ResetUserPasswordCommand command) {
         User user = userRepository.findByUuid(command.userUuid())
                 .orElseThrow(() -> new AuthorizationDomainException("User not found: "));

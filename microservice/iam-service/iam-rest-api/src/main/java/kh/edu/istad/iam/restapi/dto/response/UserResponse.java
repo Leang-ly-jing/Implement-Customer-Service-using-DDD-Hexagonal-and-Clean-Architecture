@@ -12,6 +12,7 @@ public record UserResponse(
         String name,
         String locale,
         boolean enabled,
+        boolean accountNonLocked,
         List<RoleSummaryResponse> roles,
         Instant createdAt,
         Instant updatedAt

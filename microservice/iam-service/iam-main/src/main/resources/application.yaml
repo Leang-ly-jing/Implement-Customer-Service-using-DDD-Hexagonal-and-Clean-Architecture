@@ -1,5 +1,6 @@
 server:
   port: 9000
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -66,5 +67,10 @@ gg:
 telegram:
   bot-username: ${TELEGRAM_BOT_USERNAME}
   bot-token: ${TELEGRAM_BOT_TOKEN}
+
+jwt:
+  issuer: http://localhost:9000
+  access-token-expiration: 18000
+  refresh-token-expiration: 604800
 
 

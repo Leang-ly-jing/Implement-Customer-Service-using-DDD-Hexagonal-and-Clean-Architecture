@@ -23,7 +23,6 @@ public class GrantPermissionsToUserUseCase {
     private final CurrentActorProvider currentActorProvider;
     private final PermissionRepository permissionRepository;
 
-
     public List<PermissionGrantResult> execute(GrantPermissionsToUserCommand command) {
         User user = userRepository.findByUuid(command.userUuid())
                 .orElseThrow(() -> new AuthorizationDomainException("User not found"));

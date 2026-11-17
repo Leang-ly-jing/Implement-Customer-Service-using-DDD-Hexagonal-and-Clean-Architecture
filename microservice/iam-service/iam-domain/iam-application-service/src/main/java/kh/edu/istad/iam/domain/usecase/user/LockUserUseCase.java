@@ -1,6 +1,5 @@
 package kh.edu.istad.iam.domain.usecase.user;
 
-
 import kh.edu.istad.iam.domain.entity.User;
 import kh.edu.istad.iam.domain.exception.AuthorizationDomainException;
 import kh.edu.istad.iam.domain.port.out.CurrentActorProvider;

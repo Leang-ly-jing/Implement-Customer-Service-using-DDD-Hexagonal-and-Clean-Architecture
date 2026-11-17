@@ -40,6 +40,7 @@ public class User extends BaseAuditEntity<Long> {
     private boolean enabled;
     private boolean accountNonExpired;
     private boolean accountNonLocked;
+    private Instant lockedUntil;
     private boolean credentialsNonExpired;
     private int failedLoginAttempts;
     private Instant lastLoginAt;
@@ -473,11 +474,19 @@ public class User extends BaseAuditEntity<Long> {
     }
 
     public boolean isAccountNonLocked() {
-        return accountNonLocked;
+        return accountNonLocked && (lockedUntil == null || lockedUntil.isBefore(Instant.now()));
     }
 
     public void setAccountNonLocked(boolean accountNonLocked) {
         this.accountNonLocked = accountNonLocked;
+    }
+
+    public Instant getLockedUntil() {
+        return lockedUntil;
+    }
+
+    public void setLockedUntil(Instant lockedUntil) {
+        this.lockedUntil = lockedUntil;
     }
 
     public boolean isCredentialsNonExpired() {

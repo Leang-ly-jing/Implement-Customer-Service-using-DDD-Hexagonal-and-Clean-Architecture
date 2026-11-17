@@ -53,15 +53,6 @@ public class WebAuthController {
     @Value("${telegram.bot-username:}")
     private String telegramBotUsername;
 
-    @GetMapping("/login")
-    public String loginPage(@RequestParam(value = "error", required = false) String error, Model model) {
-        if (error != null) {
-            model.addAttribute("error", true);
-        }
-        model.addAttribute("telegramBotUsername", telegramBotUsername);
-        return "login";
-    }
-
     @GetMapping("/login/telegram")
     public String handleTelegramLogin(@RequestParam Map<String, String> params,
                                       HttpServletRequest request,
@@ -175,38 +166,6 @@ public class WebAuthController {
             return hex.toString().equalsIgnoreCase(hash);
         } catch (Exception e) {
             return false;
-        }
-    }
-
-    @GetMapping("/register")
-    public String registerPage(Model model) {
-        model.addAttribute("request", new RegisterForm("", "", "", "", "", "", "km"));
-        return "register";
-    }
-
-    @PostMapping("/register")
-    public String handleRegister(@Valid @ModelAttribute("request") RegisterForm request,
-                                 BindingResult bindingResult,
-                                 Model model) {
-        if (bindingResult.hasErrors()) {
-            return "register";
-        }
-
-        try {
-            RegisterUserCommand command = new RegisterUserCommand(
-                    request.userName(),
-                    request.email(),
-                    request.password(),
-                    request.confirmPassword(),
-                    request.givenName(),
-                    request.familyName(),
-                    request.locale() != null ? request.locale() : "km"
-            );
-            registerUserUseCase.execute(command);
-            return "redirect:/login?registered=true";
-        } catch (Exception e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "register";
         }
     }
 }

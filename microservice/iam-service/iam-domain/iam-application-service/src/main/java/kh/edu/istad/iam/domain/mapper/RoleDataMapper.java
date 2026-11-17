@@ -46,6 +46,8 @@ public class RoleDataMapper {
         return new RoleSummary(
                 role.getUuid(),
                 role.getName(),
+                role.getDescription(),
+                role.isSystem(),
                 role.isActive()
         );
     }

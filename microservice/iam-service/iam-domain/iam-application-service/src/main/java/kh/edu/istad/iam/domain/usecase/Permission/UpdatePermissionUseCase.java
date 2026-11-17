@@ -20,7 +20,6 @@ public class UpdatePermissionUseCase {
     private final CurrentActorProvider currentActorProvider;
     private final PermissionDataMapper permissionDataMapper;
 
-
     public PermissionResult execute(UpdatePermissionCommand command) {
         Permission permission = permissionRepository.findByUuid(command.permissionUuid())
                 .orElseThrow(() ->

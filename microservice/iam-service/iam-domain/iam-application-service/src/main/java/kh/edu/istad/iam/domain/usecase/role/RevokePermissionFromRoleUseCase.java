@@ -32,7 +32,6 @@ public class RevokePermissionFromRoleUseCase {
         RolePermission rolePermission = roleRepository.findActiveRolePermission(role.getId(), permission.getId())
                 .orElseThrow(() -> new AuthorizationDomainException("Active permission assignment not found on role"));
 
-
         rolePermission.revoke(currentActorProvider.getCurrentActor(), reason);
 
         roleRepository.saveRolePermission(rolePermission);

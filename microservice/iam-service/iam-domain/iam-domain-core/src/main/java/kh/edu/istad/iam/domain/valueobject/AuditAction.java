@@ -1,0 +1,18 @@
+package kh.edu.istad.iam.domain.valueobject;
+
+public enum AuditAction {
+    LOGIN_SUCCESS,
+    LOGIN_FAILURE,
+    USER_CREATED,
+    USER_UPDATED,
+    USER_DELETED,
+    ROLE_ASSIGNED,
+    ROLE_REVOKED,
+    PERMISSION_UPDATED,
+    PASSWORD_RESET,
+    ACCOUNT_LOCKED,
+    ACCOUNT_UNLOCKED,
+    ACCOUNT_ENABLED,
+    ACCOUNT_DISABLED,
+    CONFIG_UPDATED
+}

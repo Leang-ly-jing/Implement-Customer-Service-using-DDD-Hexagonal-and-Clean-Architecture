@@ -16,6 +16,7 @@ public record UserAuthoritiesResponse(
     {}
 
     public record DirectPermission(
+            UUID uuid,
             String name,
             String effect)
     {}

@@ -16,7 +16,6 @@ public class DisableUserUseCase {
     private final CurrentActorProvider currentActorProvider;
     private final UserRepository userRepository;
 
-
     public void execute(UUID userUuid) {
         User user = userRepository.findByUuid(userUuid)
                 .orElseThrow(() ->

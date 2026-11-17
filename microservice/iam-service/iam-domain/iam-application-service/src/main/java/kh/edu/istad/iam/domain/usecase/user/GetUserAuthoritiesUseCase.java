@@ -53,7 +53,7 @@ public class GetUserAuthoritiesUseCase {
                 permissionRepository.findById(up.getPermissionId()).ifPresent(p -> {
                     up.setPermission(p);
                     directSummaries.add
-                            (new UserAuthoritiesResult.DirectPermissionSummary(p.getName(), up.getEffect().name()));
+                            (new UserAuthoritiesResult.DirectPermissionSummary(p.getUuid(), p.getName(), up.getEffect().name()));
                 });
             }
         }

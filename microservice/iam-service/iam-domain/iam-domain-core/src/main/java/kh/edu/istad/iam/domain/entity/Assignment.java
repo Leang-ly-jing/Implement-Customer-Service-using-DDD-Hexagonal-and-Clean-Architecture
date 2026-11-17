@@ -2,7 +2,6 @@ package kh.edu.istad.iam.domain.entity;
 
 import java.time.Instant;
 
-
 public class Assignment {
     private Long id;
     private Long userId;

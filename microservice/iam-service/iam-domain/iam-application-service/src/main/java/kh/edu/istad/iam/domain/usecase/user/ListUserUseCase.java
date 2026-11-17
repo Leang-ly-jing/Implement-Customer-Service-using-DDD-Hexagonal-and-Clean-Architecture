@@ -16,7 +16,6 @@ public class ListUserUseCase {
     private final UserRepository userRepository;
     private final UserDataMapper userDataMapper;
 
-
     public PageResult<UserSummary> execute(UserFilterQuery query) {
         List<User> users = userRepository.findAll(query.page(), query.size(), query.sort());
         long total = userRepository.count();

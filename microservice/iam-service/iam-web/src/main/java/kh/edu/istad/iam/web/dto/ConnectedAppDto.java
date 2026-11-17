@@ -7,4 +7,3 @@ public record ConnectedAppDto(
         String clientName,
         Set<String> scopes
 ) {}
-

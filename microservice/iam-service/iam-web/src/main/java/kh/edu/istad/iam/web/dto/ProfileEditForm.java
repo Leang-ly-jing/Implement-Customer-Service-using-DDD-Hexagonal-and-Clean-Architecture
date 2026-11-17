@@ -7,4 +7,3 @@ public record ProfileEditForm(
         @NotBlank String familyName,
         String locale
 ) {}
-

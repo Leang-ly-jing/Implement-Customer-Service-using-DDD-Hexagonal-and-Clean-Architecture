@@ -47,6 +47,7 @@ public class UserPersistenceMapper {
         entity.setEnabled(user.isEnabled());
         entity.setAccountNonExpired(user.isAccountNonExpired());
         entity.setAccountNonLocked(user.isAccountNonLocked());
+        entity.setLockedUntil(user.getLockedUntil());
         entity.setCredentialsNonExpired(user.isCredentialsNonExpired());
         entity.setFailedLoginAttempts(user.getFailedLoginAttempts());
         entity.setLastLoginAt(user.getLastLoginAt());
@@ -75,7 +76,7 @@ public class UserPersistenceMapper {
             );
         }
 
-        return User.builder()
+        User user = User.builder()
                 .id(entity.getId())
                 .uuid(entity.getUuid())
                 .username(entity.getUsername())
@@ -112,6 +113,8 @@ public class UserPersistenceMapper {
                 .updatedBy(entity.getUpdatedBy())
                 .version(entity.getVersion())
                 .build();
+        user.setLockedUntil(entity.getLockedUntil());
+        return user;
     }
 
     public UserRoleEntity userRoleToEntity(UserRole domain) {

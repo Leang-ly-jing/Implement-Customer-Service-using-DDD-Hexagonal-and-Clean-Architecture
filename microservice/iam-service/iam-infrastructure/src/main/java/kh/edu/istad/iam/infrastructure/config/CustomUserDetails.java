@@ -1,6 +1,5 @@
 package kh.edu.istad.iam.infrastructure.config;
 
-
 import kh.edu.istad.iam.domain.dto.result.AuthUserResult;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

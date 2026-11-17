@@ -22,7 +22,6 @@ public class AssignPermissionsToRoleUseCase {
     private final PermissionRepository permissionRepository;
     private final CurrentActorProvider currentActorProvider;
 
-
     public List<PermissionAssignmentResult> execute(AssignPermissionsToRoleCommand command) {
         Role role = roleRepository.findByUuid(command.roleUuid())
                 .orElseThrow(() ->

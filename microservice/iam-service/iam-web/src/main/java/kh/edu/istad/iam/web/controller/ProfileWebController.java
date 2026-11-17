@@ -114,22 +114,6 @@ public class ProfileWebController {
         }
     }
 
-    @GetMapping({"/", "/profile"})
-    public String index(Authentication authentication, Model model) {
-        User user = resolveCurrentUser(authentication);
-        if ("User".equalsIgnoreCase(user.getFamilyName())) {
-            user.setFamilyName(null);
-            userRepository.save(user);
-        }
-        UserResult userResult = getUserUseCase.execute(user.getUuid());
-        UserAuthoritiesResult authorities = getUserAuthoritiesUseCase.execute(user.getUuid());
-
-        model.addAttribute("user", userResult);
-        model.addAttribute("currentUser", user);
-        model.addAttribute("authorities", authorities);
-        return "index";
-    }
-
     @GetMapping("/profile/edit")
     public String editPage(Authentication authentication, Model model) {
         User user = resolveCurrentUser(authentication);

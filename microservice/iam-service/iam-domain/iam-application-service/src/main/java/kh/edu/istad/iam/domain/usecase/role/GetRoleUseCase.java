@@ -24,7 +24,6 @@ public class GetRoleUseCase {
     private final RoleDataMapper roleDataMapper;
     private final PermissionDataMapper permissionDataMapper;
 
-
     public RoleResult execute(UUID roleUuid) {
         Role role = roleRepository.findByUuid(roleUuid)
                 .orElseThrow(() -> new AuthorizationDomainException("Role not found"));

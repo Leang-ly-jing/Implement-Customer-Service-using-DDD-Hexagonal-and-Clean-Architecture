@@ -23,7 +23,6 @@ public class AssignRolesToUserUseCase {
     private final RoleRepository roleRepository;
     private final CurrentActorProvider currentActorProvider;
 
-
     public List<RoleAssignmentResult> execute(AssignRolesToUserCommand command) {
         User user = userRepository.findByUuid(command.userUuid())
                 .orElseThrow(() -> new AuthorizationDomainException("User not found"));

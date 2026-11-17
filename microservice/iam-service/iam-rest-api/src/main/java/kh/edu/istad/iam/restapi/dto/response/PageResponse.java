@@ -1,6 +1,5 @@
 package kh.edu.istad.iam.restapi.dto.response;
 
-
 import java.util.List;
 
 public record PageResponse<T>(

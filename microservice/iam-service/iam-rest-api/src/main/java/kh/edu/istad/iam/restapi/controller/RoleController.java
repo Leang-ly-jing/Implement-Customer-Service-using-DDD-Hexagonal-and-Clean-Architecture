@@ -15,7 +15,9 @@ import kh.edu.istad.iam.restapi.dto.request.CreateRoleRequest;
 import kh.edu.istad.iam.restapi.dto.request.UpdateRoleRequest;
 import kh.edu.istad.iam.restapi.dto.response.PageResponse;
 import kh.edu.istad.iam.restapi.dto.response.RoleResponse;
+import kh.edu.istad.iam.domain.valueobject.AuditAction;
 import kh.edu.istad.iam.restapi.mapper.RoleWebMapper;
+import kh.edu.istad.iam.restapi.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,19 +41,20 @@ public class RoleController {
     private final AssignPermissionsToRoleUseCase assignPermissionsToRoleUseCase;
     private final RevokePermissionFromRoleUseCase revokePermissionFromRoleUseCase;
     private final RoleWebMapper roleWebMapper;
+    private final AuditLogService auditLogService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('role:create')")
-    public RoleResponse create(@Valid @RequestBody
-                                   CreateRoleRequest request) {
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('role:create')")
+    public RoleResponse create(@Valid @RequestBody CreateRoleRequest request) {
         CreateRoleCommand command = roleWebMapper.toCommand(request);
         RoleResult result = createRoleUseCase.execute(command);
+        auditLogService.record(AuditAction.ROLE_ASSIGNED, "ROLE", result.uuid().toString(), "Created role: " + result.name());
         return roleWebMapper.toResponse(result);
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('role:read')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('role:read')")
     public PageResponse<RoleSummary> list(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
@@ -73,56 +76,63 @@ public class RoleController {
     }
 
     @GetMapping("/{uuid}")
-    @PreAuthorize("hasAuthority('role:read')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('role:read')")
     public RoleResponse getByUuid(@PathVariable("uuid") UUID uuid) {
         RoleResult result = getRoleUseCase.execute(uuid);
         return roleWebMapper.toResponse(result);
     }
 
     @PatchMapping("/{uuid}")
-    @PreAuthorize("hasAuthority('role:update')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('role:update')")
     public RoleResponse update(@PathVariable("uuid") UUID uuid,
                                @Valid @RequestBody UpdateRoleRequest request) {
         UpdateRoleCommand command = roleWebMapper.toCommand(uuid, request);
         RoleResult result = updateRoleUseCase.execute(command);
+        auditLogService.record(AuditAction.CONFIG_UPDATED, "ROLE", uuid.toString(), "Updated role: " + result.name());
         return roleWebMapper.toResponse(result);
     }
 
     @DeleteMapping("/{uuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('role:delete')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('role:delete')")
     public void delete(@PathVariable("uuid") UUID uuid) {
         deleteRoleUseCase.execute(uuid);
+        auditLogService.record(AuditAction.CONFIG_UPDATED, "ROLE", uuid.toString(), "Deleted role");
     }
 
     @PostMapping("/{uuid}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('role:update')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('role:update')")
     public void activate(@PathVariable("uuid") UUID uuid) {
         activateRoleUseCase.execute(uuid);
+        auditLogService.record(AuditAction.CONFIG_UPDATED, "ROLE", uuid.toString(), "Activated role");
     }
 
     @PostMapping("/{uuid}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('role:update')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('role:update')")
     public void deactivate(@PathVariable("uuid") UUID uuid) {
         deactivateRoleUseCase.execute(uuid);
+        auditLogService.record(AuditAction.CONFIG_UPDATED, "ROLE", uuid.toString(), "Deactivated role");
     }
 
     @PostMapping("/{uuid}/permissions")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('role:assign')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('role:assign')")
     public List<PermissionAssignmentResult> assignPermissions(@PathVariable("uuid") UUID uuid,
                                                               @Valid @RequestBody AssignPermissionsToRoleRequest request) {
         AssignPermissionsToRoleCommand command = roleWebMapper.toCommand(uuid, request);
-        return assignPermissionsToRoleUseCase.execute(command);
+        List<PermissionAssignmentResult> results = assignPermissionsToRoleUseCase.execute(command);
+        auditLogService.record(AuditAction.PERMISSION_UPDATED, "ROLE", uuid.toString(), "Assigned permissions: " + request.permissionUuids());
+        return results;
     }
 
     @DeleteMapping("/{uuid}/permissions/{permissionUuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('role:assign')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('role:assign')")
     public void revokePermission(@PathVariable("uuid") UUID uuid, @PathVariable("permissionUuid") UUID permissionUuid,
                                  @RequestParam(name = "reason", defaultValue = "REVOKED") String reason) {
         revokePermissionFromRoleUseCase.execute(uuid, permissionUuid, reason);
+        auditLogService.record(AuditAction.PERMISSION_UPDATED, "ROLE", uuid.toString(), "Revoked permission " + permissionUuid + " from role");
     }
 }

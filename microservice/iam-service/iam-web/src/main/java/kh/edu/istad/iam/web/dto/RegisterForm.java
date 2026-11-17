@@ -28,4 +28,3 @@ public record RegisterForm(
 
         String locale
 ) {}
-

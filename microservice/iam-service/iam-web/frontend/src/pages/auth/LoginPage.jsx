@@ -1,0 +1,287 @@
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { authService } from "../../api/authService";
+
+export default function LoginPage() {
+  const { t, i18n } = useTranslation();
+  const currentLang = (i18n.language || "kh").toLowerCase();
+  const isKh = currentLang.startsWith("kh") || currentLang.startsWith("km");
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/account/profile";
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    if (token) {
+      localStorage.setItem("access_token", token);
+      const usernameParam = params.get("username") || "";
+      if (usernameParam) {
+        localStorage.setItem("user", JSON.stringify({ username: usernameParam, roles: [] }));
+      }
+      navigate(from, { replace: true });
+    }
+  }, [location, from, navigate]);
+
+  const handleLanguageChange = (newLang) => {
+    const normalized = (newLang || "kh").toLowerCase();
+    i18n.changeLanguage(normalized);
+    localStorage.setItem("lang", normalized);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      await authService.login(username, password);
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(err.response?.data?.message || err.response?.data?.detail || t("auth.loginError"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 font-sans relative selection:bg-blue-100 selection:text-blue-700">
+
+      <div className="fixed inset-0 pointer-events-none -z-10 subtle-grid"></div>
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-80 bg-gradient-to-b from-blue-100/50 via-blue-50/20 to-transparent blur-3xl pointer-events-none -z-10"></div>
+
+      <div className="w-full max-w-md">
+
+        <div className="flex items-center justify-between mb-6 px-1">
+          <Link to="/" className="flex items-center gap-2 group">
+            <img
+              src="https://www.istad.co/icon.png"
+              alt="ISTAD Logo"
+              className="w-8 h-8 object-contain rounded-full transition group-hover:scale-105"
+            />
+            <span className="font-bold text-slate-900 group-hover:text-blue-600 transition text-sm">
+              ISTAD IAM
+            </span>
+          </Link>
+
+          <div className="flex items-center bg-white/80 backdrop-blur-sm p-0.5 rounded-lg border border-slate-200/80 shadow-xs text-xs font-medium text-slate-600">
+            <button
+              type="button"
+              onClick={() => handleLanguageChange("kh")}
+              className={`px-2.5 py-1 rounded-md transition ${isKh ? "bg-slate-100 text-slate-900 font-semibold" : "hover:text-slate-900 hover:bg-slate-100"}`}
+            >
+              ខ្មែរ (KH)
+            </button>
+            <span className="text-slate-300">|</span>
+            <button
+              type="button"
+              onClick={() => handleLanguageChange("en")}
+              className={`px-2.5 py-1 rounded-md transition ${!isKh ? "bg-slate-100 text-slate-900 font-semibold" : "hover:text-slate-900 hover:bg-slate-100"}`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-xl shadow-slate-200/50 p-6 sm:p-8 space-y-6">
+          <div className="space-y-1">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+              {t("auth.signInTitle")}
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500">{t("auth.signInSubtitle")}</p>
+          </div>
+
+          {error && (
+            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+              <svg
+                className="w-5 h-5 flex-shrink-0 mt-0.5 text-rose-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+              <span className="leading-relaxed font-medium">{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+                {t("auth.usernameOrEmail")}
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  autoComplete="username"
+                  placeholder="username"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600">
+                  {t("auth.password")}
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                >
+                  {t("auth.forgotPassword")}
+                </Link>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 focus:bg-white transition"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-2 inline-flex items-center justify-center py-2.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium text-sm rounded-xl shadow-md shadow-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-60 cursor-pointer"
+            >
+              {loading ? t("auth.signingIn") : t("auth.signIn")}
+            </button>
+          </form>
+
+          <div className="relative flex items-center justify-center">
+            <div className="w-full border-t border-slate-200"></div>
+            <span className="absolute bg-white px-3 text-xs uppercase tracking-wider text-slate-400 font-medium">
+              {t("auth.or")}
+            </span>
+          </div>
+
+          <div className="space-y-2.5">
+
+            <a
+              href="/oauth2/authorization/google"
+              className="w-full inline-flex items-center justify-center gap-3 py-2.5 px-4 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition shadow-xs"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.15z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.15C3.26 21.4 7.34 24 12 24z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.28 14.27a7.2 7.2 0 0 1 0-4.54V6.58H1.24a12.01 12.01 0 0 0 0 10.84l4.04-3.15z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.6 1.24 6.58l4.04 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                />
+              </svg>
+              <span>{t("auth.continueWith")} Google</span>
+            </a>
+
+            <a
+              href="/oauth2/authorization/github"
+              className="w-full inline-flex items-center justify-center gap-3 py-2.5 px-4 bg-slate-900 border border-slate-900 rounded-xl text-xs sm:text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900/30 transition shadow-xs"
+            >
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                />
+              </svg>
+              <span>{t("auth.continueWith")} GitHub</span>
+            </a>
+
+            <a
+              href="/oauth2/authorization/facebook"
+              className="w-full inline-flex items-center justify-center gap-3 py-2.5 px-4 bg-[#1877F2] hover:bg-[#166fe5] border border-[#1877F2] rounded-xl text-xs sm:text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-[#1877F2]/30 transition shadow-xs"
+            >
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
+              <span>{t("auth.continueWith")} Facebook</span>
+            </a>
+
+            <a
+              href="/oauth2/authorization/telegram"
+              className="w-full inline-flex items-center justify-center gap-3 py-2.5 px-4 bg-[#24A1DE] hover:bg-[#1e8bc0] border border-[#24A1DE] rounded-xl text-xs sm:text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-[#24A1DE]/30 transition shadow-xs"
+            >
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.536-.195 1.006.128.832.922z" />
+              </svg>
+              <span>{t("auth.continueWith")} Telegram</span>
+            </a>
+          </div>
+
+          <p className="text-center text-xs sm:text-sm text-slate-500 pt-2 border-t border-slate-100">
+            {t("auth.noAccount")}{" "}
+            <Link
+              to="/register"
+              className="text-blue-600 font-semibold hover:text-blue-700 hover:underline ml-1"
+            >
+              {t("auth.signUp")}
+            </Link>
+          </p>
+        </div>
+
+        <p className="text-center text-xs text-slate-400 mt-6">
+          &copy; 2026 ISTAD IAM. {t("auth.copyright")}
+        </p>
+      </div>
+    </div>
+  );
+}

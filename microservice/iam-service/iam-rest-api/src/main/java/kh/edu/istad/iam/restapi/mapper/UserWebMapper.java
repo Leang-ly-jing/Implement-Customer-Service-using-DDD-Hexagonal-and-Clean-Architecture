@@ -114,6 +114,7 @@ public class UserWebMapper {
                 result.name(),
                 result.locale(),
                 result.enabled(),
+                result.accountNonLocked(),
                 roles,
                 result.createdAt(),
                 result.updatedAt()
@@ -129,7 +130,7 @@ public class UserWebMapper {
         List<UserAuthoritiesResponse.DirectPermission> directPermissions = List.of();
         if (result.directPermissions() != null) {
             directPermissions = result.directPermissions().stream()
-                    .map(p -> new UserAuthoritiesResponse.DirectPermission(p.name(), p.effect()))
+                    .map(p -> new UserAuthoritiesResponse.DirectPermission(p.uuid(), p.name(), p.effect()))
                     .toList();
         }
         return new UserAuthoritiesResponse(

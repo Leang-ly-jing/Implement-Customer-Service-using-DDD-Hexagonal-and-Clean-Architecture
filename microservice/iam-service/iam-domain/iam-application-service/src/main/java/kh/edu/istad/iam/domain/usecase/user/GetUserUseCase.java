@@ -27,7 +27,6 @@ public class GetUserUseCase {
         User user = userRepository.findByUuid(uuid)
                 .orElseThrow(()-> new AuthorizationDomainException("User not found"));
 
-
         List<UserRole> userRoles = userRepository.findRolesByUserId(user.getId());
         List<RoleSummary> roleSummaries = new ArrayList<>();
         for (UserRole ur : userRoles) {
@@ -38,6 +37,5 @@ public class GetUserUseCase {
         }
         return userDataMapper.userToUserResult(user,roleSummaries);
     }
-
 
 }

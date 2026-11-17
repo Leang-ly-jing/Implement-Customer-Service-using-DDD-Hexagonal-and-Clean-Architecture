@@ -35,7 +35,7 @@ public class PermissionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('permission:create')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('permission:create')")
     public PermissionResponse create(@Valid @RequestBody
                                          CreatePermissionRequest request) {
         CreatePermissionCommand command = permissionWebMapper.toCommand(request);
@@ -44,7 +44,7 @@ public class PermissionController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('permission:read')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('permission:read')")
     public PageResponse<PermissionResult> list(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
@@ -66,14 +66,14 @@ public class PermissionController {
     }
 
     @GetMapping("/{uuid}")
-    @PreAuthorize("hasAuthority('permission:read')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('permission:read')")
     public PermissionResponse getByUuid(@PathVariable("uuid") UUID uuid) {
         PermissionResult result = getPermissionUseCase.execute(uuid);
         return permissionWebMapper.toResponse(result);
     }
 
     @PatchMapping("/{uuid}")
-    @PreAuthorize("hasAuthority('permission:update')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('permission:update')")
     public PermissionResponse update(@PathVariable("uuid") UUID uuid,
                                      @Valid @RequestBody UpdatePermissionRequest request) {
         UpdatePermissionCommand command = permissionWebMapper.toCommand(uuid, request);
@@ -83,21 +83,21 @@ public class PermissionController {
 
     @DeleteMapping("/{uuid}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('permission:delete')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('permission:delete')")
     public void delete(@PathVariable("uuid") UUID uuid) {
         deletePermissionUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('permission:update')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('permission:update')")
     public void activate(@PathVariable("uuid") UUID uuid) {
         activatePermissionUseCase.execute(uuid);
     }
 
     @PostMapping("/{uuid}/deactivate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasAuthority('permission:update')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ADMIN') or hasAuthority('permission:update')")
     public void deactivate(@PathVariable("uuid") UUID uuid) {
         deactivatePermissionUseCase.execute(uuid);
     }

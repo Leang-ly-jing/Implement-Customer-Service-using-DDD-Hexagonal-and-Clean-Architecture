@@ -7,5 +7,6 @@ public record UserSummary(
         String username,
         String email,
         String name,
-        boolean enabled
+        boolean enabled,
+        boolean accountNonLocked
 ) {}

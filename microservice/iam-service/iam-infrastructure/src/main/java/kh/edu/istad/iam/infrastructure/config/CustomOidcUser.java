@@ -62,4 +62,3 @@ public class CustomOidcUser extends DefaultOidcUser implements UserDetails {
         return authUser.enabled();
     }
 }
-

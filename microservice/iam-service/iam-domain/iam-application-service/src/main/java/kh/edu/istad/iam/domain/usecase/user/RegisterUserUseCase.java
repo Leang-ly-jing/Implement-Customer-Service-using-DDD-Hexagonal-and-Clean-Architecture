@@ -25,7 +25,6 @@ public class RegisterUserUseCase {
     private final PasswordHasher passwordHasher;
     private final UserDataMapper userDataMapper;
 
-
     public UserResult execute(RegisterUserCommand command){
         if (!command.password().equals(command.confirmPassword())) {
             throw new AuthorizationDomainException("Your passwords do not match with your confirm password");

@@ -13,18 +13,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UnlockUserUseCase {
 
-
     private final UserRepository userRepository;
     private final CurrentActorProvider currentActorProvider;
-
 
     public void execute(UUID userUuid) {
         User user = userRepository.findByUuid(userUuid)
                 .orElseThrow(() ->
                         new AuthorizationDomainException("User not found!"));
 
-
         user.setAccountNonLocked(true);
+        user.setLockedUntil(null);
         user.setFailedLoginAttempts(0);
         user.setUpdatedAt(Instant.now());
         user.setUpdatedBy(currentActorProvider.getCurrentActor());

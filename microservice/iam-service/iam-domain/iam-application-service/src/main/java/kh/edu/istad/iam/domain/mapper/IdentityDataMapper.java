@@ -1,6 +1,5 @@
 package kh.edu.istad.iam.domain.mapper;
 
-
 import kh.edu.istad.iam.domain.dto.command.identity.FederatedIdentityCommand;
 import kh.edu.istad.iam.domain.dto.result.IdentityResult;
 import kh.edu.istad.iam.domain.entity.Identity;

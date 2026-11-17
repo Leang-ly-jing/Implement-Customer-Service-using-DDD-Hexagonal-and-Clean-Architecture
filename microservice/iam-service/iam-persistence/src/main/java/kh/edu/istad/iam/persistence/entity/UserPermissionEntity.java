@@ -25,7 +25,7 @@ public class UserPermissionEntity {
     private Long permissionId;
 
     @Column(name = "effect", nullable = false, length = 5)
-    private String effect; // GRANT or DENY
+    private String effect;
 
     @Column(name = "assigned_at", nullable = false)
     private Instant assignedAt;

@@ -16,6 +16,7 @@ public record UserAuthoritiesResult(
             Instant expiresAt
     ) {}
     public record DirectPermissionSummary(
+            UUID uuid,
             String name,
             String effect
     ) {}

@@ -17,7 +17,6 @@ public class ActivatePermissionUseCase {
     private final PermissionRepository permissionRepository;
     private final CurrentActorProvider currentActorProvider;
 
-
     public void execute(UUID permissionUuid) {
         Permission permission = permissionRepository.findByUuid(permissionUuid)
                 .orElseThrow(() -> new AuthorizationDomainException(

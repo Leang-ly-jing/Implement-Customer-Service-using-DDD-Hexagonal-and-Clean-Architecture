@@ -15,7 +15,6 @@ public class EnableUserUseCase {
     private final UserRepository userRepository;
     private final CurrentActorProvider currentActorProvider;
 
-
     public void execute(UUID userUuid) {
         User user = userRepository.findByUuid(userUuid)
                 .orElseThrow(() -> new AuthorizationDomainException("User not found!"));

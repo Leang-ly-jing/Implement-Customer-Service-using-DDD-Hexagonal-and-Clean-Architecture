@@ -54,12 +54,33 @@ public class FindOrProvisionFederatedUserUseCase {
             targetUser.setUpdatedBy("FEDERATION");
             userRepository.save(targetUser);
         } else {
-            String username = command.username() != null ? command.username() : "user_" + UUID.randomUUID().toString().substring(0, 8);
+            String rawUsername = command.username() != null ? command.username().trim() : "user_" + UUID.randomUUID().toString().substring(0, 8);
+            String username = rawUsername.replaceAll("\\s+", "_");
             while (userRepository.existsByUsername(username)) {
                 username = "user_" + UUID.randomUUID().toString().substring(0, 8);
             }
 
-            String email = command.email() != null ? command.email() : username + "@social.istad.co";
+            String cleanEmailUsername = username.replaceAll("[^a-zA-Z0-9._-]", "");
+            if (cleanEmailUsername.isBlank()) {
+                cleanEmailUsername = "user_" + UUID.randomUUID().toString().substring(0, 8);
+            }
+
+            String email = (command.email() != null && !command.email().isBlank())
+                    ? command.email().trim()
+                    : cleanEmailUsername + "@social.istad.co";
+
+            String rawName = command.displayName() != null && !command.displayName().isBlank()
+                    ? command.displayName().trim()
+                    : "Social User";
+
+            String familyName = "User";
+            String givenName = rawName;
+
+            if (rawName.contains(" ")) {
+                int lastSpace = rawName.lastIndexOf(" ");
+                familyName = rawName.substring(0, lastSpace).trim();
+                givenName = rawName.substring(lastSpace + 1).trim();
+            }
 
             User newUser = User.builder()
                     .uuid(UUID.randomUUID())
@@ -67,8 +88,8 @@ public class FindOrProvisionFederatedUserUseCase {
                     .email(email)
                     .emailVerified(command.emailVerified())
                     .passwordHash(null)
-                    .givenName(command.displayName() != null ? command.displayName() : "Social")
-                    .familyName(null)
+                    .givenName(givenName.isBlank() ? "Social" : givenName)
+                    .familyName(familyName.isBlank() ? "User" : familyName)
                     .locale("km")
                     .pictureUrl(command.pictureUrl())
                     .enabled(true)
@@ -105,4 +126,3 @@ public class FindOrProvisionFederatedUserUseCase {
         return loadUserForAuthenticationUseCase.execute(targetUser.getUsernameValue());
     }
 }
-

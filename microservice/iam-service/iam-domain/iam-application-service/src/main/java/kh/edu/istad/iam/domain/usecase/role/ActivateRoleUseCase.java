@@ -22,7 +22,6 @@ public class ActivateRoleUseCase {
                 .orElseThrow(() ->
                         new AuthorizationDomainException("Role not found"));
 
-
         role.setActive(true);
         role.setUpdatedAt(Instant.now());
         role.setUpdatedBy(currentActorProvider.getCurrentActor());

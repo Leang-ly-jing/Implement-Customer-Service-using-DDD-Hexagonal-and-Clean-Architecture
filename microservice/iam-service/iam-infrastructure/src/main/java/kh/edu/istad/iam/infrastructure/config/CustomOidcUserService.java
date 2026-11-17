@@ -111,4 +111,3 @@ public class CustomOidcUserService extends OidcUserService {
         }
     }
 }
-

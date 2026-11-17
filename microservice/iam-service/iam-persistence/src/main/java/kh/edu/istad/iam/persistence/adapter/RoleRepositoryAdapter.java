@@ -26,7 +26,6 @@ public class RoleRepositoryAdapter implements RoleRepository {
     private final RolePermissionJpaRepository rolePermissionJpaRepository;
     private final RolePersistenceMapper rolePersistenceMapper;
 
-
     @Override
     public Role save(Role role) {
         RoleEntity roleEntity = rolePersistenceMapper.roleToEntity(role);

@@ -75,6 +75,7 @@ public class UserDataMapper {
                 user.getFullName(),
                 user.getLocale(),
                 user.isEnabled(),
+                user.isAccountNonLocked(),
                 roles != null ? roles : List.of(),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
@@ -86,7 +87,8 @@ public class UserDataMapper {
                 user.getUsernameValue(),
                 user.getEmailValue(),
                 user.getFullName(),
-                user.isEnabled()
+                user.isEnabled(),
+                user.isAccountNonLocked()
         );
     }
     public AuthUserResult userToAuthUserResult(User user, Set<String> authorities) {

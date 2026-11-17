@@ -30,4 +30,6 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     Page<UserEntity> findAllByIsDeletedFalse(Pageable pageable);
 
     long countByIsDeletedFalse();
+
+    long countByEnabledTrueAndIsDeletedFalse();
 }
