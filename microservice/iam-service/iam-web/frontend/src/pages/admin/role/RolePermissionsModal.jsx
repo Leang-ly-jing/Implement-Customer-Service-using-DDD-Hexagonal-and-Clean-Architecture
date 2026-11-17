@@ -5,6 +5,10 @@ import {
   Search,
   RefreshCw,
   X,
+  Trash2,
+  ShieldCheck,
+  Check,
+  CheckCheck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,12 +35,27 @@ export function RolePermissionsModal({
   lang = "km",
 }) {
   const [tab, setTab] = useState("assigned")
+  const [assignedSearch, setAssignedSearch] = useState("")
   const [search, setSearch] = useState("")
   const [selectedToAdd, setSelectedToAdd] = useState([])
 
+  // Deduplicate assigned permissions by uuid or name
+  const uniqueAssigned = useMemo(() => {
+    const seen = new Set()
+    const list = []
+    for (const p of rolePermissions || []) {
+      const key = p.uuid || p.name
+      if (key && !seen.has(key)) {
+        seen.add(key)
+        list.push(p)
+      }
+    }
+    return list
+  }, [rolePermissions])
+
   const assignedUuids = useMemo(
-    () => new Set(rolePermissions.map((p) => p.uuid)),
-    [rolePermissions]
+    () => new Set(uniqueAssigned.map((p) => p.uuid)),
+    [uniqueAssigned]
   )
 
   const unassigned = useMemo(
@@ -44,13 +63,26 @@ export function RolePermissionsModal({
     [allPermissions, assignedUuids]
   )
 
+  const filteredAssigned = useMemo(() => {
+    if (!assignedSearch.trim()) return uniqueAssigned
+    const q = assignedSearch.toLowerCase().trim()
+    return uniqueAssigned.filter(
+      (p) =>
+        p.name?.toLowerCase().includes(q) ||
+        p.resource?.toLowerCase().includes(q) ||
+        p.action?.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q)
+    )
+  }, [uniqueAssigned, assignedSearch])
+
   const filteredUnassigned = useMemo(() => {
     if (!search.trim()) return unassigned
-    const q = search.toLowerCase()
+    const q = search.toLowerCase().trim()
     return unassigned.filter(
       (p) =>
         p.name?.toLowerCase().includes(q) ||
         p.resource?.toLowerCase().includes(q) ||
+        p.action?.toLowerCase().includes(q) ||
         p.description?.toLowerCase().includes(q)
     )
   }, [unassigned, search])
@@ -64,143 +96,311 @@ export function RolePermissionsModal({
     setTab("assigned")
   }
 
+  const handleSelectAllFiltered = () => {
+    const ids = filteredUnassigned.map((p) => p.uuid)
+    const combined = Array.from(new Set([...selectedToAdd, ...ids]))
+    setSelectedToAdd(combined)
+  }
+
+  const handleClearSelection = () => {
+    setSelectedToAdd([])
+  }
+
+  const getActionBadgeClass = (action) => {
+    switch ((action || "").toLowerCase()) {
+      case "create":
+      case "write":
+        return "border-emerald-200 bg-emerald-50 text-emerald-700"
+      case "read":
+      case "view":
+        return "border-blue-200 bg-blue-50 text-blue-700"
+      case "update":
+      case "edit":
+        return "border-amber-200 bg-amber-50 text-amber-700"
+      case "delete":
+      case "remove":
+        return "border-rose-200 bg-rose-50 text-rose-700"
+      default:
+        return "border-zinc-200 bg-zinc-50 text-zinc-700"
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Key className="size-5 text-primary" />
-            <span>
-              {lang === "km"
-                ? `គ្រប់គ្រង Permissions: ${role.name}`
-                : `Manage Permissions: ${role.name}`}
-            </span>
-          </DialogTitle>
-          <DialogDescription>
-            {role.description ||
-              (lang === "km"
-                ? "ផ្ដល់ ឬដកសិទ្ធិអនុញ្ញាតសម្រាប់ Role នេះ"
-                : "Assign or revoke permission scopes for this role.")}
-          </DialogDescription>
+      <DialogContent className="sm:max-w-2xl w-full max-h-[85vh] flex flex-col p-6 gap-4">
+        <DialogHeader className="space-y-1">
+          <div className="flex items-center gap-2">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Key className="size-4.5" />
+            </div>
+            <div>
+              <DialogTitle className="text-base font-semibold">
+                {lang === "km"
+                  ? `គ្រប់គ្រង Permissions: ${role.name}`
+                  : `Manage Permissions: ${role.name}`}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                {role.description ||
+                  (lang === "km"
+                    ? "ផ្ដល់ ឬដកសិទ្ធិអនុញ្ញាតសម្រាប់ Role នេះ"
+                    : "Assign or revoke permission scopes for this role.")}
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
-        <div className="flex items-center gap-2 border-b pb-2 pt-1">
+        {/* Tab Switcher */}
+        <div className="grid grid-cols-2 p-1 bg-muted/80 rounded-lg text-xs font-medium">
           <button
             type="button"
             onClick={() => setTab("assigned")}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+            className={`flex items-center justify-center gap-2 py-2 rounded-md transition-all ${
               tab === "assigned"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted"
+                ? "bg-background text-foreground shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {lang === "km" ? "Permissions ដែលមាន" : "Assigned Permissions"} ({rolePermissions.length})
+            <ShieldCheck className="size-4 text-emerald-600" />
+            <span>{lang === "km" ? "Permissions ដែលមាន" : "Assigned Permissions"}</span>
+            <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-mono font-bold">
+              {uniqueAssigned.length}
+            </span>
           </button>
           <button
             type="button"
             onClick={() => setTab("add")}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+            className={`flex items-center justify-center gap-2 py-2 rounded-md transition-all ${
               tab === "add"
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted"
+                ? "bg-background text-foreground shadow-xs font-semibold"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {lang === "km" ? "+ បន្ថែម Permission ថ្មី" : "+ Assign More Permissions"}
+            <Plus className="size-4 text-primary" />
+            <span>{lang === "km" ? "បន្ថែម Permission ថ្មី" : "Assign More Permissions"}</span>
+            {unassigned.length > 0 && (
+              <span className="ml-1 rounded-full bg-primary/15 text-primary px-2 py-0.5 text-[10px] font-mono font-bold">
+                +{unassigned.length}
+              </span>
+            )}
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto py-2">
+        {/* Tab Content */}
+        <div className="flex-1 overflow-y-auto pr-1">
           {loading ? (
-            <div className="py-12 text-center text-muted-foreground">
-              <RefreshCw className="size-6 animate-spin mx-auto mb-2 opacity-60" />
-              <p className="text-xs">
+            <div className="py-16 text-center text-muted-foreground">
+              <RefreshCw className="size-7 animate-spin mx-auto mb-2 opacity-60" />
+              <p className="text-xs font-medium">
                 {lang === "km" ? "កំពុងទាញយក Permissions..." : "Loading permissions..."}
               </p>
             </div>
           ) : tab === "assigned" ? (
-
-            rolePermissions.length === 0 ? (
-              <div className="py-12 text-center text-muted-foreground">
-                <Key className="size-8 mx-auto mb-2 opacity-30" />
-                <p className="text-xs font-medium">
-                  {lang === "km"
-                    ? "Role នេះមិនទាន់មាន Permission ណាមួយនៅឡើយទេ"
-                    : "No permissions assigned to this role yet."}
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setTab("add")}
-                  className="mt-3 gap-1 text-xs"
-                >
-                  <Plus className="size-3.5" />
-                  <span>{lang === "km" ? "ផ្ដល់ Permission ឥឡូវនេះ" : "Assign Permissions Now"}</span>
-                </Button>
-              </div>
-            ) : (
-              <div className="divide-y divide-border/60 border rounded-lg overflow-hidden">
-                {rolePermissions.map((p) => (
-                  <div key={p.uuid} className="flex items-center justify-between p-3 hover:bg-muted/30">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-semibold text-foreground">{p.name}</span>
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-muted-foreground/30">
-                          {p.resource} : {p.action}
-                        </Badge>
-                      </div>
-                      {p.description && (
-                        <p className="text-[11px] text-muted-foreground mt-0.5">{p.description}</p>
-                      )}
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onRevokePermission(p.uuid)}
-                      className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 h-7 px-2 text-xs gap-1"
-                      title={lang === "km" ? "ដកសិទ្ធិនេះចេញ" : "Revoke this permission"}
+            <div className="space-y-3">
+              {/* Search Bar for Assigned */}
+              {uniqueAssigned.length > 0 && (
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                  <Input
+                    value={assignedSearch}
+                    onChange={(e) => setAssignedSearch(e.target.value)}
+                    placeholder={
+                      lang === "km"
+                        ? "ស្វែងរក permission ក្នុង role នេះ..."
+                        : "Filter assigned permissions by name, resource, action..."
+                    }
+                    className="pl-8 pr-8 h-8.5 text-xs"
+                  />
+                  {assignedSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setAssignedSearch("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
                       <X className="size-3.5" />
-                      <span>{lang === "km" ? "ដកចេញ" : "Revoke"}</span>
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )
-          ) : (
+                    </button>
+                  )}
+                </div>
+              )}
 
-            <div className="space-y-3">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
-                <Input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder={lang === "km" ? "ស្វែងរក permission តាមឈ្មោះ ឬ resource..." : "Search permissions..."}
-                  className="pl-8 h-8 text-xs"
-                />
-              </div>
-
-              <div className="max-h-64 overflow-y-auto border rounded-lg divide-y divide-border/60">
-                {filteredUnassigned.length === 0 ? (
-                  <p className="text-xs text-muted-foreground p-6 text-center">
-                    {lang === "km" ? "គ្មាន Permission ណាដែលទំនេរសម្រាប់ផ្ដល់ទៀតទេ" : "No unassigned permissions available."}
+              {uniqueAssigned.length === 0 ? (
+                <div className="py-16 text-center text-muted-foreground border rounded-xl bg-muted/10">
+                  <Key className="size-9 mx-auto mb-2.5 opacity-30 text-primary" />
+                  <p className="text-sm font-medium text-foreground">
+                    {lang === "km"
+                      ? "Role នេះមិនទាន់មាន Permission ណាមួយនៅឡើយទេ"
+                      : "No permissions assigned to this role yet."}
                   </p>
+                  <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+                    {lang === "km"
+                      ? "ចុចប៊ូតុងខាងក្រោមដើម្បីផ្ដល់សិទ្ធិថ្មីដល់ Role នេះ"
+                      : "Click below to assign new access permissions to this role."}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTab("add")}
+                    className="mt-4 gap-1.5 text-xs"
+                  >
+                    <Plus className="size-3.5" />
+                    <span>{lang === "km" ? "ផ្ដល់ Permission ឥឡូវនេះ" : "Assign Permissions Now"}</span>
+                  </Button>
+                </div>
+              ) : filteredAssigned.length === 0 ? (
+                <div className="py-12 text-center text-muted-foreground border rounded-xl">
+                  <Search className="size-7 mx-auto mb-2 opacity-30" />
+                  <p className="text-xs">
+                    {lang === "km"
+                      ? "រកមិនឃើញ Permission ដែលត្រូវនឹងការស្វែងរកទេ"
+                      : "No matching permissions found."}
+                  </p>
+                </div>
+              ) : (
+                <div className="border rounded-xl divide-y divide-border/60 overflow-hidden bg-card">
+                  {filteredAssigned.map((p) => (
+                    <div
+                      key={p.uuid}
+                      className="flex items-center justify-between p-3 hover:bg-muted/30 transition-colors gap-3"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="font-mono text-xs font-bold text-foreground">
+                            {p.name}
+                          </span>
+                          {p.resource && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-muted text-muted-foreground border">
+                              {p.resource}
+                            </span>
+                          )}
+                          {p.action && (
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] uppercase font-mono px-1.5 py-0 ${getActionBadgeClass(
+                                p.action
+                              )}`}
+                            >
+                              {p.action}
+                            </Badge>
+                          )}
+                        </div>
+                        {p.description && (
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                            {p.description}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onRevokePermission(p.uuid)}
+                        className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200/60 h-8 px-2.5 text-xs font-medium gap-1.5 transition-colors shrink-0"
+                        title={lang === "km" ? "ដកសិទ្ធិនេះចេញ" : "Revoke this permission"}
+                      >
+                        <Trash2 className="size-3.5" />
+                        <span>{lang === "km" ? "ដកចេញ" : "Revoke"}</span>
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+                  <Input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder={
+                      lang === "km"
+                        ? "ស្វែងរក permission តាមឈ្មោះ, resource..."
+                        : "Search available permissions..."
+                    }
+                    className="pl-8 pr-8 h-8.5 text-xs"
+                  />
+                  {search && (
+                    <button
+                      type="button"
+                      onClick={() => setSearch("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {filteredUnassigned.length > 0 && (
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleSelectAllFiltered}
+                      className="h-8.5 text-xs text-muted-foreground hover:text-foreground gap-1 px-2"
+                    >
+                      <CheckCheck className="size-3.5" />
+                      <span>{lang === "km" ? "ជ្រើសទាំងអស់" : "Select All"}</span>
+                    </Button>
+                    {selectedToAdd.length > 0 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleClearSelection}
+                        className="h-8.5 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-2"
+                      >
+                        {lang === "km" ? "សម្អាត" : "Clear"}
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="max-h-72 overflow-y-auto border rounded-xl divide-y divide-border/60 bg-card">
+                {filteredUnassigned.length === 0 ? (
+                  <div className="p-8 text-center text-muted-foreground">
+                    <Key className="size-7 mx-auto mb-2 opacity-30 text-primary" />
+                    <p className="text-xs font-medium">
+                      {lang === "km"
+                        ? "គ្មាន Permission ណាដែលទំនេរសម្រាប់ផ្ដល់ទៀតទេ"
+                        : "No unassigned permissions available."}
+                    </p>
+                  </div>
                 ) : (
                   filteredUnassigned.map((p) => {
                     const isSelected = selectedToAdd.includes(p.uuid)
                     return (
                       <label
                         key={p.uuid}
-                        className="flex items-center justify-between p-2.5 hover:bg-muted/40 cursor-pointer text-xs"
+                        className={`flex items-center justify-between p-3 cursor-pointer transition-colors text-xs gap-3 ${
+                          isSelected ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-muted/40"
+                        }`}
                       >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono font-medium text-foreground">{p.name}</span>
-                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-muted-foreground/30">
-                              {p.resource} : {p.action}
-                            </Badge>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-mono text-xs font-semibold text-foreground">
+                              {p.name}
+                            </span>
+                            {p.resource && (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-muted text-muted-foreground border">
+                                {p.resource}
+                              </span>
+                            )}
+                            {p.action && (
+                              <Badge
+                                variant="outline"
+                                className={`text-[10px] uppercase font-mono px-1.5 py-0 ${getActionBadgeClass(
+                                  p.action
+                                )}`}
+                              >
+                                {p.action}
+                              </Badge>
+                            )}
                           </div>
                           {p.description && (
-                            <p className="text-[11px] text-muted-foreground mt-0.5">{p.description}</p>
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                              {p.description}
+                            </p>
                           )}
                         </div>
                         <input
@@ -213,7 +413,7 @@ export function RolePermissionsModal({
                               setSelectedToAdd(selectedToAdd.filter((id) => id !== p.uuid))
                             }
                           }}
-                          className="size-4 rounded border-border text-primary focus:ring-primary ml-2"
+                          className="size-4 rounded border-border text-primary focus:ring-primary shrink-0 cursor-pointer"
                         />
                       </label>
                     )
@@ -221,20 +421,25 @@ export function RolePermissionsModal({
                 )}
               </div>
 
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-xs text-muted-foreground">
+              {/* Assignment Action Bar */}
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-xs text-muted-foreground font-medium">
                   {selectedToAdd.length} {lang === "km" ? "បានជ្រើសរើស" : "selected"}
                 </span>
                 <Button
                   size="sm"
                   onClick={handleAssignClick}
                   disabled={selectedToAdd.length === 0 || assignSubmitting}
-                  className="gap-1.5 text-xs"
+                  className="gap-1.5 text-xs font-semibold shadow-xs"
                 >
-                  {assignSubmitting && <RefreshCw className="size-3.5 animate-spin" />}
+                  {assignSubmitting ? (
+                    <RefreshCw className="size-3.5 animate-spin" />
+                  ) : (
+                    <Check className="size-3.5" />
+                  )}
                   <span>
                     {lang === "km"
-                      ? `ផ្ដល់ ${selectedToAdd.length} Permissions ទៅ Role`
+                      ? `ផ្ដល់ ${selectedToAdd.length} Permissions`
                       : `Assign ${selectedToAdd.length} Permissions`}
                   </span>
                 </Button>
@@ -243,8 +448,8 @@ export function RolePermissionsModal({
           )}
         </div>
 
-        <DialogFooter className="border-t pt-3">
-          <Button variant="outline" onClick={onClose}>
+        <DialogFooter className="border-t pt-3 flex items-center justify-end">
+          <Button variant="outline" size="sm" onClick={onClose} className="text-xs">
             {lang === "km" ? "បិទ" : "Close"}
           </Button>
         </DialogFooter>

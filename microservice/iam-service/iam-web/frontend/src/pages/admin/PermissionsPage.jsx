@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Plus, Search, RefreshCw } from "lucide-react"
+import { Plus, Search } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,7 +19,6 @@ export default function PermissionsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [resourceFilter, setResourceFilter] = useState("ALL")
-  const [statusFilter, setStatusFilter] = useState("ALL")
   const [currentPage, setCurrentPage] = useState(0)
 
   const [createOpen, setCreateOpen] = useState(false)
@@ -45,11 +44,6 @@ export default function PermissionsPage() {
       }
       if (resourceFilter !== "ALL") {
         url += `&resource=${encodeURIComponent(resourceFilter)}`
-      }
-      if (statusFilter === "ACTIVE") {
-        url += `&enabled=true`
-      } else if (statusFilter === "INACTIVE") {
-        url += `&enabled=false`
       }
       const res = await axiosClient.get(url)
       setPermissions(res.data?.content || [])
@@ -81,7 +75,7 @@ export default function PermissionsPage() {
 
   useEffect(() => {
     fetchPermissions(0)
-  }, [resourceFilter, statusFilter])
+  }, [resourceFilter])
 
   useEffect(() => {
     fetchResourcesCatalog()
@@ -212,15 +206,6 @@ export default function PermissionsPage() {
             <Plus className="size-4" />
             <span>{lang === "km" ? "បង្កើត Permission ថ្មី" : "Create Permission"}</span>
           </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => fetchPermissions(currentPage)}
-            disabled={loading}
-            title={lang === "km" ? "ផ្ទុកឡើងវិញ" : "Refresh"}
-          >
-            <RefreshCw className={`size-4 ${loading ? "animate-spin" : ""}`} />
-          </Button>
         </div>
       </div>
 
@@ -256,40 +241,6 @@ export default function PermissionsPage() {
               </select>
             </div>
           )}
-
-          <div className="inline-flex rounded-lg border bg-muted/40 p-0.5 text-xs font-medium">
-            <button
-              type="button"
-              onClick={() => setStatusFilter("ALL")}
-              className={`px-3 py-1 rounded-md transition-all ${
-                statusFilter === "ALL" ? "bg-background text-foreground shadow-xs font-semibold" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {lang === "km" ? "ទាំងអស់" : "All"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setStatusFilter("ACTIVE")}
-              className={`px-3 py-1 rounded-md transition-all ${
-                statusFilter === "ACTIVE" ? "bg-background text-foreground shadow-xs font-semibold" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {lang === "km" ? "សកម្ម" : "Active"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setStatusFilter("INACTIVE")}
-              className={`px-3 py-1 rounded-md transition-all ${
-                statusFilter === "INACTIVE" ? "bg-background text-foreground shadow-xs font-semibold" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {lang === "km" ? "អសកម្ម" : "Inactive"}
-            </button>
-          </div>
-
-          <Badge variant="outline" className="px-2.5 py-1 text-xs font-normal border-muted-foreground/30">
-            {pageMeta.totalElements} {lang === "km" ? "Permissions" : "Permissions"}
-          </Badge>
         </div>
       </div>
 

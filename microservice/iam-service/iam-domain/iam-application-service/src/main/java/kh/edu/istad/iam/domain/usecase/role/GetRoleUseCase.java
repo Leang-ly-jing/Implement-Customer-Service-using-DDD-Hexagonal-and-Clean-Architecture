@@ -13,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 @Component
 @RequiredArgsConstructor
@@ -30,8 +32,9 @@ public class GetRoleUseCase {
 
         List<RolePermission> rps = roleRepository.findPermissionsByRoleId(role.getId());
         List<PermissionResult> permissions = new ArrayList<>();
+        Set<Long> seenIds = new HashSet<>();
         for (RolePermission rp : rps) {
-            if (rp.isActive()) {
+            if (rp.isActive() && seenIds.add(rp.getPermissionId())) {
                 permissionRepository.findById(rp.getPermissionId()).ifPresent(p ->
                         permissions.add(permissionDataMapper.permissionToPermissionResult(p)));
             }

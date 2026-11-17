@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react"
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
+import { LogOut } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import axiosClient from "@/api/axiosClient"
 import { AppSidebar } from "@/components/app-sidebar"
 import { CommandSearch, LanguageToggle, ThemeToggle } from "@/components/header-actions"
+import { Button } from "@/components/ui/button"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -51,7 +53,7 @@ export default function AccountLayout() {
             })
           )
         } catch {
-
+           console.error("Failed to update user in localStorage")
         }
 
         setUser({
@@ -73,12 +75,19 @@ export default function AccountLayout() {
     }
   }, [isAdmin, pathname, navigate])
 
+  // const onLogout = () => {
+  //   localStorage.removeItem("access_token")
+  //   localStorage.removeItem("user")
+  //   localStorage.removeItem("user_avatar")
+  //   window.location.assign("/login")
+  // }
+
   const onLogout = () => {
-    localStorage.removeItem("access_token")
-    localStorage.removeItem("user")
-    localStorage.removeItem("user_avatar")
-    window.location.assign("/login")
-  }
+  localStorage.removeItem("access_token")
+  localStorage.removeItem("user")
+  localStorage.removeItem("user_avatar")
+  window.location.href = "/logout"
+}
 
   return (
     <SidebarProvider>
@@ -107,6 +116,16 @@ export default function AccountLayout() {
             <CommandSearch isAdmin={isAdmin} />
             <LanguageToggle />
             <ThemeToggle />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onLogout}
+              className="gap-1.5 text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200 shadow-2xs"
+              title={t("common.logout")}
+            >
+              <LogOut className="size-4" />
+              <span className="hidden sm:inline font-medium">{t("common.logout")}</span>
+            </Button>
           </div>
         </header>
 

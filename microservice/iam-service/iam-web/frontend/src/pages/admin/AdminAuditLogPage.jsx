@@ -29,7 +29,6 @@ export function AdminAuditLogPage() {
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(0)
   const [search, setSearch] = useState("")
-  const [actionFilter, setActionFilter] = useState("ALL")
 
   const fetchAuditLogs = async (page = 0) => {
     setLoading(true)
@@ -148,16 +147,15 @@ export function AdminAuditLogPage() {
   }
 
   const filteredLogs = data.content.filter((item) => {
-    const matchesSearch =
-      search === "" ||
-      item.actor?.toLowerCase().includes(search.toLowerCase()) ||
-      item.details?.toLowerCase().includes(search.toLowerCase()) ||
-      item.targetId?.toLowerCase().includes(search.toLowerCase()) ||
-      item.targetType?.toLowerCase().includes(search.toLowerCase())
-
-    if (!matchesSearch) return false
-    if (actionFilter !== "ALL" && item.action !== actionFilter) return false
-    return true
+    if (!search.trim()) return true
+    const q = search.toLowerCase()
+    return (
+      item.actor?.toLowerCase().includes(q) ||
+      item.details?.toLowerCase().includes(q) ||
+      item.targetId?.toLowerCase().includes(q) ||
+      item.targetType?.toLowerCase().includes(q) ||
+      item.action?.toLowerCase().includes(q)
+    )
   })
 
   return (
@@ -175,10 +173,6 @@ export function AdminAuditLogPage() {
           <Badge variant="outline" className="px-2.5 py-1 text-xs font-normal border-muted-foreground/30">
             {data.page.totalElements} {isKm ? "កំណត់ត្រា" : "records"}
           </Badge>
-          <Button variant="outline" size="sm" onClick={() => fetchAuditLogs(currentPage)} disabled={loading}>
-            <RefreshCw className={`size-4 mr-1.5 ${loading ? "animate-spin" : ""}`} />
-            <span>{t("common.refresh")}</span>
-          </Button>
         </div>
       </div>
 
@@ -188,31 +182,11 @@ export function AdminAuditLogPage() {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
               <Input
-                placeholder={isKm ? "ស្វែងរកតាម Actor, Details, Target..." : "Search logs by actor, details..."}
+                placeholder={isKm ? "ស្វែងរកតាម Actor, Action, Details..." : "Search logs by actor, action, details..."}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-8 text-xs"
               />
-            </div>
-
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 text-xs">
-              <span className="text-muted-foreground whitespace-nowrap">{isKm ? "តម្រង:" : "Filter:"}</span>
-              <select
-                value={actionFilter}
-                onChange={(e) => setActionFilter(e.target.value)}
-                className="rounded border border-input bg-background px-2.5 py-1 text-xs shadow-xs"
-              >
-                <option value="ALL">{isKm ? "សកម្មភាពទាំងអស់" : "All Actions"}</option>
-                <option value="USER_CREATED">USER_CREATED</option>
-                <option value="USER_UPDATED">USER_UPDATED</option>
-                <option value="ROLE_ASSIGNED">ROLE_ASSIGNED</option>
-                <option value="ROLE_REVOKED">ROLE_REVOKED</option>
-                <option value="PERMISSION_UPDATED">PERMISSION_UPDATED</option>
-                <option value="PASSWORD_RESET">PASSWORD_RESET</option>
-                <option value="ACCOUNT_LOCKED">ACCOUNT_LOCKED</option>
-                <option value="ACCOUNT_UNLOCKED">ACCOUNT_UNLOCKED</option>
-                <option value="CONFIG_UPDATED">CONFIG_UPDATED</option>
-              </select>
             </div>
           </div>
         </CardHeader>

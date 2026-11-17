@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react"
-import { Plus, RefreshCw, Search } from "lucide-react"
+import { Plus, Search } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -22,7 +22,6 @@ export function UsersPage() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState("ALL")
 
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
@@ -52,20 +51,15 @@ export function UsersPage() {
 
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
-      const matchesSearch =
-        search === "" ||
-        u.username?.toLowerCase().includes(search.toLowerCase()) ||
-        u.email?.toLowerCase().includes(search.toLowerCase()) ||
-        u.name?.toLowerCase().includes(search.toLowerCase())
-
-      if (!matchesSearch) return false
-
-      if (statusFilter === "ACTIVE") return u.enabled && u.accountNonLocked !== false
-      if (statusFilter === "DISABLED") return !u.enabled
-      if (statusFilter === "LOCKED") return u.accountNonLocked === false
-      return true
+      if (!search.trim()) return true
+      const q = search.toLowerCase()
+      return (
+        u.username?.toLowerCase().includes(q) ||
+        u.email?.toLowerCase().includes(q) ||
+        u.name?.toLowerCase().includes(q)
+      )
     })
-  }, [users, search, statusFilter])
+  }, [users, search])
 
   const handleToggleActivate = async (u) => {
     const isActivating = !u.enabled
@@ -114,10 +108,6 @@ export function UsersPage() {
           description={t("usersPage.subtitle")}
         />
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={fetchUsers} disabled={loading}>
-            <RefreshCw className={`size-4 ${loading ? "animate-spin" : ""}`} />
-            <span className="hidden sm:inline">{t("common.refresh")}</span>
-          </Button>
           <Button size="sm" onClick={() => setCreateModalOpen(true)} className="gap-1.5">
             <Plus className="size-4" />
             <span>{t("usersPage.addUser")}</span>
@@ -136,23 +126,6 @@ export function UsersPage() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-8"
               />
-            </div>
-
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-              {["ALL", "ACTIVE", "DISABLED", "LOCKED"].map((f) => (
-                <Button
-                  key={f}
-                  variant={statusFilter === f ? "default" : "outline"}
-                  size="xs"
-                  onClick={() => setStatusFilter(f)}
-                  className="rounded-full text-xs"
-                >
-                  {f === "ALL" && t("common.all")}
-                  {f === "ACTIVE" && t("common.active")}
-                  {f === "DISABLED" && t("common.disabled")}
-                  {f === "LOCKED" && t("common.locked")}
-                </Button>
-              ))}
             </div>
           </div>
         </CardHeader>

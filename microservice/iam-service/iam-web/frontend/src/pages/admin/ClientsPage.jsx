@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react"
-import { Plus, Search, RefreshCw, AppWindow } from "lucide-react"
+import { Plus, AppWindow } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { toast } from "@/components/ui/toast"
 import axiosClient from "@/api/axiosClient"
 import { PageHeader } from "../account/shared"
@@ -19,7 +16,6 @@ export default function ClientsPage() {
   const [clients, setClients] = useState([])
   const [pageMeta, setPageMeta] = useState({ number: 0, size: 10, totalElements: 0, totalPages: 0 })
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState("")
   const [currentPage, setCurrentPage] = useState(0)
 
   const [createOpen, setCreateOpen] = useState(false)
@@ -49,10 +45,7 @@ export default function ClientsPage() {
   const fetchClients = async (page = 0) => {
     setLoading(true)
     try {
-      let url = `/admin/clients?page=${page}&size=10`
-      if (search.trim()) {
-        url += `&search=${encodeURIComponent(search.trim())}`
-      }
+      const url = `/admin/clients?page=${page}&size=10`
       const res = await axiosClient.get(url)
       setClients(res.data?.content || [])
       setPageMeta(res.data?.page || { number: 0, size: 10, totalElements: 0, totalPages: 0 })
@@ -71,11 +64,6 @@ export default function ClientsPage() {
   useEffect(() => {
     fetchClients(0)
   }, [])
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault()
-    fetchClients(0)
-  }
 
   const handleCreateSubmit = async (form) => {
     if (!form.clientId.trim() || !form.clientName.trim()) {
@@ -224,36 +212,12 @@ export default function ClientsPage() {
           }
         />
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => fetchClients(currentPage)} disabled={loading}>
-            <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
-            <span className="hidden sm:inline">{lang === "km" ? "ផ្ទុកឡើងវិញ" : "Refresh"}</span>
-          </Button>
           <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-1.5">
             <Plus className="size-4" />
             <span>{lang === "km" ? "ចុះឈ្មោះ Client" : "Register Client"}</span>
           </Button>
         </div>
       </div>
-
-      <Card className="shadow-xs border">
-        <CardHeader className="py-3 px-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <Input
-                placeholder={lang === "km" ? "ស្វែងរកតាម Client ID, ឈ្មោះ..." : "Search clients..."}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-8 h-9 text-xs"
-              />
-            </form>
-
-            <Badge variant="outline" className="px-2.5 py-1 text-xs font-normal border-muted-foreground/30 w-fit">
-              {pageMeta.totalElements} {lang === "km" ? "Clients សរុប" : "Total Clients"}
-            </Badge>
-          </div>
-        </CardHeader>
-      </Card>
 
       <ClientsTable
         clients={clients}

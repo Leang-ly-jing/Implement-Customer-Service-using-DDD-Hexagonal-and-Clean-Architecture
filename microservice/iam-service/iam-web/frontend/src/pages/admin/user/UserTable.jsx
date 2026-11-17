@@ -12,10 +12,18 @@ import {
   KeyRound,
   Activity,
   History,
+  MoreVertical,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function UserTable({
   users = [],
@@ -37,11 +45,11 @@ export function UserTable({
       <table className="w-full text-left text-sm">
         <thead className="bg-muted/50 text-xs uppercase text-muted-foreground border-y">
           <tr>
-            <th className="px-4 py-3">{t("usersPage.table.user")}</th>
-            <th className="px-4 py-3">{t("usersPage.table.email")}</th>
-            <th className="px-4 py-3">{t("usersPage.table.status")}</th>
-            <th className="px-4 py-3">{t("usersPage.table.security")}</th>
-            <th className="px-4 py-3 text-right">{t("usersPage.table.actions")}</th>
+            <th className="px-4 py-3">{t("username")}</th>
+            <th className="px-4 py-3">{t("email")}</th>
+            <th className="px-4 py-3">{t("status")}</th>
+            <th className="px-4 py-3">{t("security")}</th>
+            <th className="px-4 py-3 text-right">{t("actions")}</th>
           </tr>
         </thead>
         <tbody className="divide-y">
@@ -104,104 +112,119 @@ export function UserTable({
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
-                      {/* View Details */}
+                      {/* View Details Quick Action */}
                       <Button
                         variant="ghost"
-                        size="icon-xs"
+                        size="icon"
+                        className="size-8 text-muted-foreground hover:text-foreground"
                         title={t("common.viewDetails")}
-                        className="text-foreground/70 hover:text-foreground hover:bg-muted"
                         onClick={() => onViewDetails?.(u)}
                       >
-                        <Eye className="size-3.5" />
+                        <Eye className="size-4" />
                       </Button>
 
-                      {/* Edit Profile */}
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={t("common.editProfile")}
-                        className="text-foreground/70 hover:text-foreground hover:bg-muted"
-                        onClick={() => onEdit?.(u)}
-                      >
-                        <Edit2 className="size-3.5" />
-                      </Button>
+                      {/* Dropdown Menu for other actions */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8 text-muted-foreground hover:text-foreground"
+                          >
+                            <MoreVertical className="size-4" />
+                            <span className="sr-only">Actions</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-52">
+                          <DropdownMenuItem
+                            onClick={() => onEdit?.(u)}
+                            className="gap-2 cursor-pointer text-xs"
+                          >
+                            <Edit2 className="size-3.5 text-muted-foreground" />
+                            <span>{t("common.editProfile")}</span>
+                          </DropdownMenuItem>
 
-                      {/* Roles Assignment */}
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={t("common.manageRoles")}
-                        className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
-                        onClick={() => onAssignRoles?.(u)}
-                      >
-                        <ShieldCheck className="size-3.5" />
-                      </Button>
+                          <DropdownMenuSeparator />
 
-                      {/* Permissions Assignment & Inspection */}
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={t("common.managePermissions")}
-                        className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                        onClick={() => onAssignPermissions?.(u)}
-                      >
-                        <KeyRound className="size-3.5" />
-                      </Button>
+                          <DropdownMenuItem
+                            onClick={() => onAssignRoles?.(u)}
+                            className="gap-2 cursor-pointer text-xs"
+                          >
+                            <ShieldCheck className="size-3.5 text-purple-600" />
+                            <span>{t("common.manageRoles")}</span>
+                          </DropdownMenuItem>
 
-                      {/* Sessions */}
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={t("common.manageSessions")}
-                        className="text-cyan-600 hover:text-cyan-700 hover:bg-cyan-50"
-                        onClick={() => onViewSessions?.(u)}
-                      >
-                        <Activity className="size-3.5" />
-                      </Button>
+                          <DropdownMenuItem
+                            onClick={() => onAssignPermissions?.(u)}
+                            className="gap-2 cursor-pointer text-xs"
+                          >
+                            <KeyRound className="size-3.5 text-amber-600" />
+                            <span>{t("common.managePermissions")}</span>
+                          </DropdownMenuItem>
 
-                      {/* Login History */}
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={t("common.loginHistory")}
-                        className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
-                        onClick={() => onViewHistory?.(u)}
-                      >
-                        <History className="size-3.5" />
-                      </Button>
+                          <DropdownMenuItem
+                            onClick={() => onViewSessions?.(u)}
+                            className="gap-2 cursor-pointer text-xs"
+                          >
+                            <Activity className="size-3.5 text-cyan-600" />
+                            <span>{t("common.manageSessions")}</span>
+                          </DropdownMenuItem>
 
-                      {/* Activate / Deactivate Toggle */}
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={u.enabled ? t("common.deactivateAccount") : t("common.activateAccount")}
-                        className={u.enabled ? "text-amber-600 hover:text-amber-700 hover:bg-amber-50" : "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"}
-                        onClick={() => onToggleActivate?.(u)}
-                      >
-                        {u.enabled ? <UserX className="size-3.5" /> : <UserCheck className="size-3.5" />}
-                      </Button>
+                          <DropdownMenuItem
+                            onClick={() => onViewHistory?.(u)}
+                            className="gap-2 cursor-pointer text-xs"
+                          >
+                            <History className="size-3.5 text-indigo-600" />
+                            <span>{t("common.loginHistory")}</span>
+                          </DropdownMenuItem>
 
-                      {/* Lock / Unlock Toggle */}
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={isLocked ? t("common.unlockAccount") : t("common.lockAccount")}
-                        className={isLocked ? "text-blue-600 hover:text-blue-700 hover:bg-blue-50" : "text-orange-600 hover:text-orange-700 hover:bg-orange-50"}
-                        onClick={() => onToggleLock?.(u)}
-                      >
-                        {isLocked ? <Unlock className="size-3.5" /> : <Lock className="size-3.5" />}
-                      </Button>
+                          <DropdownMenuSeparator />
 
-                      {/* Delete */}
-                      <Button
-                        variant="ghost"
-                        size="icon-xs"
-                        title={t("common.deleteUser")}
-                        className="text-rose-600 hover:text-rose-700 hover:bg-rose-50"
-                        onClick={() => onDelete?.(u)}
-                      >
-                        <Trash2 className="size-3.5" />
-                      </Button>
+                          <DropdownMenuItem
+                            onClick={() => onToggleActivate?.(u)}
+                            className="gap-2 cursor-pointer text-xs"
+                          >
+                            {u.enabled ? (
+                              <>
+                                <UserX className="size-3.5 text-amber-600" />
+                                <span>{t("common.deactivateAccount")}</span>
+                              </>
+                            ) : (
+                              <>
+                                <UserCheck className="size-3.5 text-emerald-600" />
+                                <span>{t("common.activateAccount")}</span>
+                              </>
+                            )}
+                          </DropdownMenuItem>
+
+                          <DropdownMenuItem
+                            onClick={() => onToggleLock?.(u)}
+                            className="gap-2 cursor-pointer text-xs"
+                          >
+                            {isLocked ? (
+                              <>
+                                <Unlock className="size-3.5 text-blue-600" />
+                                <span>{t("common.unlockAccount")}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Lock className="size-3.5 text-orange-600" />
+                                <span>{t("common.lockAccount")}</span>
+                              </>
+                            )}
+                          </DropdownMenuItem>
+
+                          <DropdownMenuSeparator />
+
+                          <DropdownMenuItem
+                            onClick={() => onDelete?.(u)}
+                            className="gap-2 cursor-pointer text-xs text-rose-600 focus:text-rose-600 focus:bg-rose-50"
+                          >
+                            <Trash2 className="size-3.5" />
+                            <span>{t("common.deleteUser")}</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </td>
                 </tr>

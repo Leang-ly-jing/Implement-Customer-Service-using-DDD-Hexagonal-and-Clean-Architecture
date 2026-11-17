@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import {
   RefreshCw,
   AlertTriangle,
@@ -102,16 +103,6 @@ export function AdminLoginHistoryPage() {
           <Badge variant="outline" className="px-2.5 py-1 text-xs font-normal border-muted-foreground/30">
             {data.page.totalElements} {lang === "km" ? "កំណត់ត្រា" : "records"}
           </Badge>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => fetchHistory(currentPage)}
-            disabled={loading}
-            className="gap-1.5"
-          >
-            <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
-            <span>{lang === "km" ? "ផ្ទុកឡើងវិញ" : "Refresh"}</span>
-          </Button>
         </div>
       </div>
 

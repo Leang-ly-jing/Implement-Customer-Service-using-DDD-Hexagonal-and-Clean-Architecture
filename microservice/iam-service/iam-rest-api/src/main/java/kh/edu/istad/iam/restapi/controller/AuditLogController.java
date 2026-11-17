@@ -17,8 +17,8 @@ public class AuditLogController {
 
     @GetMapping
     public PageResponse<AuditLogResponse> getAll(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size
     ) {
         return service.findAll(page, size);
     }

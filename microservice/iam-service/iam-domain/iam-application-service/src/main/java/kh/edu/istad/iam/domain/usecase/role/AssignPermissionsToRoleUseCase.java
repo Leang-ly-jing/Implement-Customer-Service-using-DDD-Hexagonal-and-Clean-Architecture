@@ -34,6 +34,10 @@ public class AssignPermissionsToRoleUseCase {
         List<Permission> permissions = permissionRepository.findByUuids(command.permissionUuids());
         for (Permission p : permissions) {
             p.validateCanAssign();
+            if (roleRepository.findActiveRolePermission(role.getId(), p.getId()).isPresent()) {
+                results.add(new PermissionAssignmentResult(p.getUuid(), p.getName(), now, command.expiresAt(), command.reason()));
+                continue;
+            }
             RolePermission rolePermission = RolePermission.builder()
                     .roleId(role.getId())
                     .permissionId(p.getId())

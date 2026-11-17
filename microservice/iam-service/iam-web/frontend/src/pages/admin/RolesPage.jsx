@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react"
-import { Shield, Plus, Search, RefreshCw } from "lucide-react"
+import { Plus } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { toast } from "@/components/ui/toast"
 import axiosClient from "@/api/axiosClient"
 import { PageHeader } from "../account/shared"
@@ -17,8 +15,6 @@ export default function RolesPage() {
   const [roles, setRoles] = useState([])
   const [pageMeta, setPageMeta] = useState({ number: 0, size: 10, totalElements: 0, totalPages: 0 })
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState("ALL")
   const [currentPage, setCurrentPage] = useState(0)
 
   const [allPermissions, setAllPermissions] = useState([])
@@ -45,15 +41,7 @@ export default function RolesPage() {
   const fetchRoles = async (page = 0) => {
     setLoading(true)
     try {
-      let url = `/roles?page=${page}&size=10&sort=createdAt,desc`
-      if (search.trim()) {
-        url += `&search=${encodeURIComponent(search.trim())}`
-      }
-      if (statusFilter === "ACTIVE") {
-        url += `&enabled=true`
-      } else if (statusFilter === "INACTIVE") {
-        url += `&enabled=false`
-      }
+      const url = `/roles?page=${page}&size=10&sort=createdAt,desc`
       const res = await axiosClient.get(url)
       setRoles(res.data?.content || [])
       setPageMeta(res.data?.page || { number: 0, size: 10, totalElements: 0, totalPages: 0 })
@@ -81,12 +69,7 @@ export default function RolesPage() {
   useEffect(() => {
     fetchRoles(0)
     fetchAllPermissions()
-  }, [statusFilter])
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault()
-    fetchRoles(0)
-  }
+  }, [])
 
   const handleCreateSubmit = async (form) => {
     if (!form.name.trim()) {
@@ -260,49 +243,12 @@ export default function RolesPage() {
           }
         />
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => fetchRoles(currentPage)} disabled={loading}>
-            <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
-            <span className="hidden sm:inline">{lang === "km" ? "ផ្ទុកឡើងវិញ" : "Refresh"}</span>
-          </Button>
           <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-1.5">
             <Plus className="size-4" />
             <span>{lang === "km" ? "បង្កើត Role ថ្មី" : "Create Role"}</span>
           </Button>
         </div>
       </div>
-
-      <Card className="shadow-xs border">
-        <CardHeader className="py-3 px-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <Input
-                placeholder={lang === "km" ? "ស្វែងរកតាមឈ្មោះ Role..." : "Search roles..."}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-8 h-9 text-xs"
-              />
-            </form>
-
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-              {["ALL", "ACTIVE", "INACTIVE"].map((f) => (
-                <Button
-                  key={f}
-                  type="button"
-                  variant={statusFilter === f ? "default" : "outline"}
-                  size="xs"
-                  onClick={() => setStatusFilter(f)}
-                  className="rounded-full text-xs h-7"
-                >
-                  {f === "ALL" && (lang === "km" ? "ទាំងអស់" : "All")}
-                  {f === "ACTIVE" && (lang === "km" ? "សកម្ម" : "Active")}
-                  {f === "INACTIVE" && (lang === "km" ? "អសកម្ម" : "Inactive")}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
 
       <RolesTable
         roles={roles}

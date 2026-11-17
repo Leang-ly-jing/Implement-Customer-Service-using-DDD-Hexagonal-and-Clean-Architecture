@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Moon, Search, Sun } from "lucide-react"
+import { Moon, Sun } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
@@ -38,20 +38,6 @@ export function CommandSearch({ isAdmin = false }) {
 
   return (
     <>
-      <Button
-        variant="outline"
-        className="w-9 justify-start gap-2 px-2.5 text-muted-foreground sm:w-64"
-        onClick={() => setOpen(true)}
-      >
-        <Search className="size-4 shrink-0" />
-        <span className="hidden flex-1 text-left font-normal sm:inline">
-          {t("common.searchPlaceholder")}
-        </span>
-        <kbd className="hidden rounded border bg-muted px-1.5 text-[10px] sm:inline">
-          ⌘K
-        </kbd>
-      </Button>
-
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder={t("common.searchPlaceholder")} />
         <CommandList>

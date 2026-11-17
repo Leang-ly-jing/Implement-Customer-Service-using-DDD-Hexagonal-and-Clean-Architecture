@@ -1,4 +1,17 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          iam-service:
+            client-id: gateway-client
+            client-secret: secret
+            scope: openid, profile, email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          iam-service:
+            issuer-uri: http://localhost:9000
   application:
     name: gateway-server
   profiles:
